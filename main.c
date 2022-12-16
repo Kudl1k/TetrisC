@@ -29,9 +29,13 @@ int main()
         SDL_Quit();
         return 1;
     }
-
-
+    //* generace random block na startu
+    srand(time(0));
+    int blknumber = rand() % 7;
+    
     float secondsElapsed = 0;
+
+
 
 
     SDL_Event e;
@@ -52,20 +56,20 @@ int main()
                         rotate_block(&block[5]);
                         break;
                     case SDLK_DOWN:
-                        block[5].y += BOARD_S;
+                        block[blknumber].y += BOARD_S;
                         break;
                     case SDLK_LEFT:
-                        if(check_border(&block[5]) == 0) block[5].x -= BOARD_S;
+                        if(check_border(&block[blknumber]) == 0) block[blknumber].x -= BOARD_S;
                         break;
                     case SDLK_RIGHT:
-                        block[5].x += BOARD_S;
+                        block[blknumber].x += BOARD_S;
                 }
             }
             
         }
         if (secondsElapsed >1)
         {
-            block[5].y += BOARD_S;
+            block[blknumber].y += BOARD_S;
             secondsElapsed = 0;
         }
         
@@ -76,7 +80,7 @@ int main()
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        draw_block(&block[5],renderer);
+        draw_block(&block[blknumber],renderer);
 
         SDL_RenderPresent(renderer);
 
@@ -91,6 +95,7 @@ int main()
     return 0;
 }
 
+//! pomocne funkce
 
 void rotate_block(Tetrino *block){
     int N = 4;
