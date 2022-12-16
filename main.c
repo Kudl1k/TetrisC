@@ -3,10 +3,7 @@
 
 void draw_block(Tetrino *block,SDL_Renderer *renderer);
 void rotate_block(Tetrino *block);
-int check_border(Tetrino *block);
-
-
-SDL_Rect border = {0,0,WINDOW_W,WINDOW_H};
+int colision(Tetrino *block);
 
 
 int main()
@@ -53,25 +50,25 @@ int main()
             {
                 switch (e.key.keysym.sym){
                     case SDLK_UP:
-                        rotate_block(&block[5]);
+                        rotate_block(&block[blknumber]);
                         break;
                     case SDLK_DOWN:
                         block[blknumber].y += BOARD_S;
                         break;
                     case SDLK_LEFT:
-                        if(check_border(&block[blknumber]) == 0) block[blknumber].x -= BOARD_S;
+                        if (colision(&block[blknumber]) == 0) block[blknumber].x -= BOARD_S;
                         break;
                     case SDLK_RIGHT:
-                        block[blknumber].x += BOARD_S;
+                        if (colision(&block[blknumber]) == 0) block[blknumber].x += BOARD_S;
                 }
             }
             
         }
-        if (secondsElapsed >1)
-        {
-            block[blknumber].y += BOARD_S;
-            secondsElapsed = 0;
-        }
+        // if (secondsElapsed >1)
+        // {
+        //     block[blknumber].y += BOARD_S;       //! posunovac
+        //     secondsElapsed = 0;
+        // }
         
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -113,6 +110,7 @@ void draw_block(Tetrino *block,SDL_Renderer *renderer){
     blk.w = blk.h = BOARD_S;
     blk.x = block->x;
     blk.y = block->y;
+    int flag = 0;
     for (int i = 0; i < 4; i++)
     {
         for (int j = 0; j < 4; j++)
@@ -129,49 +127,41 @@ void draw_block(Tetrino *block,SDL_Renderer *renderer){
     }
 }
 
-void tetrino_hitbox(SDL_Renderer *renderer, Tetrino *block){
-    int firstcordx=0;
-    int firstcordy=0;
-    int secondcordx=0;
-    int secondcordy=0;
-    int flag=0;
+int colision(Tetrino *block){
     SDL_Rect blk;
-    blk.w = blk.h = BOARD_S;
     blk.x = block->x;
     blk.y = block->y;
-
+    int pos1 = 0;
+    int pos2 = 0;
+    int pos3 = 0;
+    int pos4 = 0;
+    int n = 0;
     for (int i = 0; i < 4; i++)
     {
         for (int j = 0; j < 4; j++)
         {
-            if (block->shape[i][j] == 1)
+            if (block->shape[i][j]==1)
             {
-                firstcordx = blk.x;
-                firstcordy = blk.y;
-                break;
+                printf("n%d=%d\n",n,blk.x);
+                if (n==0) pos1 = blk.x;
+                if (n==1) pos2 = blk.x;
+                if (n==2) pos3 = blk.x;
+                if (n==3) pos4 = blk.x;
+                n++;
             }
             blk.x += BOARD_S;
         }
-        if (flag ==1) break;
         blk.x = block->x;
-        blk.y += BOARD_S;
     }
-}
-
-
-int check_border(Tetrino *block){
-    SDL_Rect tetr;
-    tetr.x = block->x;
-    tetr.y = block->y;
-    for (int i = 0; i < 4; i++)
+    if (pos1 < BOARD_S || pos2 < BOARD_S || pos3 < BOARD_S || pos4 <BOARD_S)
     {
-        for (int j = 0; j < 4; i++)
-        {
-            printf("%d",block[4].shape[i][j]);
-            tetr.x += BOARD_S;
-        }
-        tetr.x = block->x;
-        tetr.y += BOARD_S;
+        return 1;
+    }
+    if (pos1 > WINDOW_W-2*BOARD_S || pos2 > WINDOW_W-2*BOARD_S || pos3 > WINDOW_W-2*BOARD_S || pos4 > WINDOW_W-2*BOARD_S)
+    {
+        return 1;
     }
     return 0;
 }
+
+
