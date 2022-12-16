@@ -40,6 +40,7 @@ int main()
     bool quit = false;
     while (!quit)
     {
+        blknumber = rand() % 7;
         Uint64 start = SDL_GetPerformanceCounter();
         while (SDL_PollEvent(&e))
         {
@@ -61,6 +62,9 @@ int main()
                         break;
                     case SDLK_RIGHT:
                         cur.x += BOARD_S;
+                        break;
+                    case SDLK_r:
+                        cur = block[blknumber];
                 }
             }
             
