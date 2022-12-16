@@ -33,7 +33,7 @@ int main()
     float secondsElapsed = 0;
 
 
-
+    cur = block[blknumber];
 
     SDL_Event e;
     bool quit = false;
@@ -129,37 +129,29 @@ void draw_block(Tetrino *block,SDL_Renderer *renderer){
 
 int colision(Tetrino *block){
     SDL_Rect blk;
+    printf("block.x: %d \n",block->x);
     blk.x = block->x;
     blk.y = block->y;
-    int pos1 = 0;
-    int pos2 = 0;
-    int pos3 = 0;
-    int pos4 = 0;
-    int n = 0;
     for (int i = 0; i < 4; i++)
     {
         for (int j = 0; j < 4; j++)
         {
-            if (block->shape[i][j]==1)
+            if ((block->shape[j][i]==1 && blk.x < 0))
             {
-                printf("n%d=%d\n",n,blk.x);
-                if (n==0) pos1 = blk.x;
-                if (n==1) pos2 = blk.x;
-                if (n==2) pos3 = blk.x;
-                if (n==3) pos4 = blk.x;
-                n++;
+                printf("proslo\n");
+                printf("x:%d\n",blk.x);
+                return 1;
             }
+            if ((block->shape[j][i]==1 && blk.x > WINDOW_W-2*BOARD_S))
+            {
+                printf("proslo taky\n");
+                printf("x:%d\n",blk.x);
+                return 1;
+            }
+            
             blk.x += BOARD_S;
         }
         blk.x = block->x;
-    }
-    if (pos1 < BOARD_S || pos2 < BOARD_S || pos3 < BOARD_S || pos4 <BOARD_S)
-    {
-        return 1;
-    }
-    if (pos1 > WINDOW_W-2*BOARD_S || pos2 > WINDOW_W-2*BOARD_S || pos3 > WINDOW_W-2*BOARD_S || pos4 > WINDOW_W-2*BOARD_S)
-    {
-        return 1;
     }
     return 0;
 }

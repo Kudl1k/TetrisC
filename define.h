@@ -11,8 +11,8 @@
 #define WINDOW_W BOARD_S*BOARD_W
 #define WINDOW_H BOARD_S*BOARD_H
 
-#define START_X BOARD_S*4
-#define START_Y BOARD_S*2
+#define START_X 0
+#define START_Y 0
 
 //* Definice barev
 SDL_Color Red = {255,0,0};
@@ -38,9 +38,9 @@ Tetrino block[7] ={{
     0,0,0,0,
     4,0},{
     START_X,START_Y,
+    1,1,0,0,
+    1,1,0,0,            //! Tvar O
     0,0,0,0,
-    0,1,1,0,            //! Tvar O
-    0,1,1,0,
     0,0,0,0,
     2,0},{
     START_X,START_Y,
