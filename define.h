@@ -26,6 +26,8 @@ typedef struct
     int x;
     int y;
     int shape[4][4];
+    int size;
+    int orientation;    //* 0 - start, 1 - prvni cyklus, 2 - druhy cyklus, 3 - treti cyklus
 }Tetrino;
 
 Tetrino block[7] ={{
@@ -33,35 +35,42 @@ Tetrino block[7] ={{
     1,1,1,1,
     0,0,0,0,            //! Tvar I
     0,0,0,0,
-    0,0,0,0},{
+    0,0,0,0,
+    4,0},{
     START_X,START_Y,
     0,0,0,0,
     0,1,1,0,            //! Tvar O
     0,1,1,0,
-    0,0,0,0},{
+    0,0,0,0,
+    2,0},{
     START_X,START_Y,
     0,1,0,0,
     1,1,1,0,            //! Tvar T
     0,0,0,0,
-    0,0,0,0},{
+    0,0,0,0,
+    3,0},{
     START_X,START_Y,
     0,1,0,0,
     0,1,0,0,            //! Tvar J
     1,1,0,0,
-    0,0,0,0},{
+    0,0,0,0,
+    3,0},{
     START_X,START_Y,
-    0,1,0,0,
-    0,1,0,0,            //! Tvar L
-    0,1,1,0,
-    0,0,0,0},{
+    1,0,0,0,
+    1,0,0,0,            //! Tvar L
+    1,1,0,0,
+    0,0,0,0,
+    3,0},{
     START_X,START_Y,
     0,1,1,0,
     1,1,0,0,            //! Tvar S
     0,0,0,0,
-    0,0,0,0},{
+    0,0,0,0,
+    3,0},{
     START_X,START_Y,
     1,1,0,0,
     0,1,1,0,            //! Tvar Z
     0,0,0,0,
-    0,0,0,0}
+    0,0,0,0,
+    3,0}
     },cur;

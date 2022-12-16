@@ -74,9 +74,6 @@ int main()
         }
         
 
-
-
-
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
@@ -131,6 +128,36 @@ void draw_block(Tetrino *block,SDL_Renderer *renderer){
         blk.y += BOARD_S;
     }
 }
+
+void tetrino_hitbox(SDL_Renderer *renderer, Tetrino *block){
+    int firstcordx=0;
+    int firstcordy=0;
+    int secondcordx=0;
+    int secondcordy=0;
+    int flag=0;
+    SDL_Rect blk;
+    blk.w = blk.h = BOARD_S;
+    blk.x = block->x;
+    blk.y = block->y;
+
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            if (block->shape[i][j] == 1)
+            {
+                firstcordx = blk.x;
+                firstcordy = blk.y;
+                break;
+            }
+            blk.x += BOARD_S;
+        }
+        if (flag ==1) break;
+        blk.x = block->x;
+        blk.y += BOARD_S;
+    }
+}
+
 
 int check_border(Tetrino *block){
     SDL_Rect tetr;
