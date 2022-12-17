@@ -3,8 +3,9 @@
 
 void draw_block(Tetrino *block,SDL_Renderer *renderer);
 void rotate_block(Tetrino *block);
-int colision(Tetrino *block,SDL_Renderer *renderer);
-
+int colision(Tetrino *block,gboard Gameboard);
+int getfirstcord(Tetrino *block);
+void drawtetrino(int x, int y, int w, int h, SDL_Color color,SDL_Renderer *renderer);
 
 int main()
 {
@@ -55,13 +56,13 @@ int main()
                         rotate_block(&cur);
                         break;
                     case SDLK_DOWN:
-                        cur.y += BOARD_S;
+                        cur.y += 1;
                         break;
                     case SDLK_LEFT:
-                        cur.x -= BOARD_S;
+                        if(colision(&cur,Gameboard) == 0) cur.x -= 1;
                         break;
                     case SDLK_RIGHT:
-                        cur.x += BOARD_S;
+                        cur.x += 1;
                         break;
                     case SDLK_r:
                         cur = block[blknumber];
@@ -69,11 +70,11 @@ int main()
             }
             
         }
-        if (secondsElapsed >1)
-        {
-            cur.y += BOARD_S;       //! posunovac
-            secondsElapsed = 0;
-        }
+        // if (secondsElapsed >1)
+        // {
+        //     cur.y += BOARD_S;       //! posunovac
+        //     secondsElapsed = 0;
+        // }
         
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -113,8 +114,8 @@ void rotate_block(Tetrino *block){
 void draw_block(Tetrino *block,SDL_Renderer *renderer){
     SDL_Rect blk;
     blk.w = blk.h = BOARD_S-2;
-    blk.x = block->x;
-    blk.y = block->y;
+    blk.x = block->x * BOARD_S;
+    blk.y = block->y * BOARD_S;
     SDL_Rect outline;
     outline.w = outline.h = BOARD_S;
     outline.x = blk.x;
@@ -126,36 +127,57 @@ void draw_block(Tetrino *block,SDL_Renderer *renderer){
         {
             if (block->shape[i][j] == 1)
             {
-                SDL_SetRenderDrawColor(renderer,block->color.r,block->color.g,block->color.b,255);
-                SDL_RenderFillRect(renderer,&blk);
-                SDL_SetRenderDrawColor(renderer,255,255,255,255);
-                SDL_RenderDrawRect(renderer,&outline);
+                drawtetrino(blk.x, blk.y, blk.w, blk.h,block->color,renderer);
             }
             blk.x += BOARD_S;
             outline.x = blk.x;
         }
-        blk.x = block->x;
+        blk.x = block->x * BOARD_S;
         blk.y += BOARD_S;
         outline.x = blk.x;
         outline.y = blk.y;
     }
 }
 
-int colision(Tetrino *block,SDL_Renderer *renderer){
+int colision(Tetrino *block,gboard Gameboard){
+    
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 20; j++)
+        {
+            
+        }
+        
+    }
+    
+    return 0;
+}
+
+int getfirstcord(Tetrino *block){
     SDL_Rect blk;
-    printf("block.x: %d \n",block->x);
     blk.x = block->x;
     blk.y = block->y;
+    int x =0;
     for (int i = 0; i < 4; i++)
     {
         for (int j = 0; j < 4; j++)
         {
-            
-            blk.x += BOARD_S;
+            if (block->shape[i][j] == 1 || block->shape[i][j] == 2 )
+            {
+                return x = blk.x;
+            }
+            ++blk.x;
         }
         blk.x = block->x;
     }
     return 0;
 }
 
-
+void drawtetrino(int x, int y, int w, int h, SDL_Color color,SDL_Renderer *renderer){
+    SDL_Rect rect = {x,y,w-1,h-1};
+    SDL_SetRenderDrawColor(renderer,color.r,color.g,color.b,255);
+    SDL_RenderFillRect(renderer,&rect);
+    SDL_Rect outline = {x,y,w,h};
+    SDL_SetRenderDrawColor(renderer,255,255,255,255);
+    SDL_RenderDrawRect(renderer,&outline);
+}
