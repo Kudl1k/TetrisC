@@ -37,7 +37,7 @@ int main()
 
 
     cur = block[blknumber];
-
+    int gamestage = 1;
 
     SDL_Event e;
     bool quit = false;
@@ -201,7 +201,7 @@ void drawgrid(Gameboard *board,SDL_Renderer *renderer){
     SDL_Rect grid = {0,0,0,0};
     for (int i = 0; i < BOARD_H; i++)
     {
-        for (int j = 0; j < BOARD_W; j++)
+        for (int j = 1; j <= BOARD_W; j++)
         {
             if (board->grid[i][j] == 0)
             {
