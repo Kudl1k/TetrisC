@@ -23,6 +23,7 @@ SDL_Color Red = {255,0,0};
 SDL_Color Green = {0,255,0};
 SDL_Color Blue = {0,0,255};
 SDL_Color Grey = {38,38,38};
+SDL_Color LightGrey = {125,125,125};
 
 //* Definice Tetrinů
 typedef struct
