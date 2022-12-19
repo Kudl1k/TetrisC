@@ -65,6 +65,7 @@ int main()
                         grid_reset(&board);
                         break;
                     case SDLK_DOWN:
+
                         if(!isseatled(&cur,&board)) cur.y += 1;
                         break;
                     case SDLK_LEFT:
@@ -93,6 +94,7 @@ int main()
         }
         if (fullline(&board))
         {
+            printf("true");
             clearline(&board);
             movedowngrid(&board);
         }
@@ -174,6 +176,7 @@ bool isseatled(Tetrino *block, Gameboard *board){
         {
             if ((block->shape[i][j] == 1 && board->grid[blk.y + 1][blk.x] == 3) || (block->shape[i][j] == 1 && board->grid[blk.y + 1][blk.x] == 2))
             {
+                printf("x: %d y: %d\n",block->x,block->y);
                 return true;
             } 
             blk.x++;
@@ -269,13 +272,13 @@ void drawgrid(Gameboard *board,Tetrino *block,SDL_Renderer *renderer){
     {
         for (int j = 1; j <= BOARD_W; j++)
         {
-            //printf("%d",board->grid[i][j]);
+            //printf("%d",board->grid[18][j]);
             if (board->grid[i][j] == 0) drawtetrino(grid.x,grid.y,Grey,renderer);
             if (board->grid[i][j] == 1) drawtetrino(grid.x,grid.y,block->color,renderer);
             if (board->grid[i][j] == 2) drawtetrino(grid.x,grid.y,LightGrey,renderer);
             grid.x += BOARD_S;
         }
-        //printf("\n");
+        //printf("\n\n");
         grid.x = 0;
         grid.y += BOARD_S;
     }
@@ -308,17 +311,20 @@ void grid_init(Tetrino *block,Gameboard *board){
 
 bool fullline(Gameboard *board){
     int flag = 0;
-    for (int i = 0; i < BOARD_H; i++)
+    for (int i = 19; i > 0; i--)
     {
-        for (int j = 1; j <= BOARD_W; j++)
-        {
-            if (board->grid[i][j] == 2)continue;
-            flag = 1;
+        for (int j = 1; j <= BOARD_W; j++){
+            if (board->grid[18][j] != 2)
+            {
+                flag = 0;
+                continue;
+            }
+            else flag = 0;
         }
-        if (flag == 1) return false;
+
     }
-    printf("full line");
-    return true;
+    if (flag == 0) return false;
+    if (flag == 1) return true;
 }
 
 void clearline(Gameboard *board){
