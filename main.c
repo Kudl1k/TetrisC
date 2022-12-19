@@ -4,10 +4,12 @@
 void draw_block(Tetrino *block,SDL_Renderer *renderer);
 void rotate_block(Tetrino *block);
 int colision(Tetrino *block,Gameboard board);
-int getfirstcord(Tetrino *block);
+void getfirstcord(Tetrino *block);
 int getlastcord(Tetrino *block);
 void drawtetrino(int x, int y,SDL_Color color,SDL_Renderer *renderer);
 void drawgrid(Gameboard *board,SDL_Renderer *renderer);
+void grid_init(Tetrino *block,Gameboard *board);
+
 
 int main()
 {
@@ -81,6 +83,8 @@ int main()
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
+        grid_init(&cur,&board);
+
         drawgrid(&board,renderer);
         draw_block(&cur,renderer);
 
@@ -142,32 +146,36 @@ void draw_block(Tetrino *block,SDL_Renderer *renderer){
 }
 
 int colision(Tetrino *block,Gameboard board){
-    int x1 = getfirstcord(block);
-    int x2 = getlastcord(block);
-    if (x1 < 1) return 1;
-    if (x2 > 10) return 1;
-    return 0;
+    
 }
 
-int getfirstcord(Tetrino *block){
+void getfirstcord(Tetrino *block){
     SDL_Rect blk;
     blk.x = block->x;
     blk.y = block->y;
-    int x =0;
+    int flag = 0;
     for (int i = 0; i < 4; i++)
     {
         for (int j = 0; j < 4; j++)
         {
             if (block->shape[i][j] == 1 || block->shape[i][j] == 2 )
             {
-                return x = blk.x;
+                block->x = blk.x;
+                block->y = blk.y;
+                flag = 1;
+                break;
             }
             ++blk.x;
         }
+        if (flag == 1)
+        {
+            break;
+        }
+        blk.y++;
         blk.x = block->x;
     }
-    return 0;
 }
+
 
 int getlastcord(Tetrino *block){
     SDL_Rect blk;
@@ -203,13 +211,39 @@ void drawgrid(Gameboard *board,SDL_Renderer *renderer){
     {
         for (int j = 1; j <= BOARD_W; j++)
         {
+            printf("%d",board->grid[i][j]);
             if (board->grid[i][j] == 0)
             {
                 drawtetrino(grid.x,grid.y,Grey,renderer);
             }
             grid.x += BOARD_S;
         }
+        printf("\n");
         grid.x = 0;
         grid.y += BOARD_S;
     }
+    printf("\n");
+    
+}
+
+void grid_init(Tetrino *block,Gameboard *board){
+    getfirstcord(block);
+    SDL_Rect blk;
+    blk.x = block->x;
+    blk.y = block->y;
+
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            if (block->shape[i][j] == 1 && board->grid[blk.y][blk.x] == 0)
+            {
+                board->grid[blk.y][blk.x] = block->shape[i][j];
+            }
+            blk.x++;
+        }
+        blk.x = block->x;
+        blk.y++;
+    }
+    
 }
