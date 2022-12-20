@@ -1,3 +1,7 @@
+#ifndef define
+#define define
+
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -109,3 +113,4 @@ Tetrino block[7] ={{
     0,0,0,0,
     288,0,BOARD_S,BOARD_S}
     },cur,nextblock;
+#endif

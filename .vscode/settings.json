@@ -1,6 +1,10 @@
 {
     "files.associations": {
         "help.h": "c",
-        "sdl_image.h": "c"
+        "sdl_image.h": "c",
+        "init.h": "c",
+        "define.h": "c",
+        "sdl.h": "c",
+        "time.h": "c"
     }
 }

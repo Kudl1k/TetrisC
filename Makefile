@@ -1,4 +1,4 @@
-C_FILES= main.c
+C_FILES= main.c init.c
 
 C_FLAGS= -g -fsanitize=address
 
