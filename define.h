@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <stdbool.h>
 #include <time.h>
 
@@ -19,11 +20,8 @@
 #define START_Y 0
 
 //* Definice barev
-SDL_Color Red = {255,0,0};
-SDL_Color Green = {0,255,0};
-SDL_Color Blue = {0,0,255};
-SDL_Color Grey = {38,38,38};
-SDL_Color LightGrey = {125,125,125};
+SDL_Rect Grey = {336,0,BOARD_S,BOARD_S};
+SDL_Rect LightGrey = {384,0,BOARD_S,BOARD_S};
 
 //* Definice Tetrinů
 typedef struct
@@ -34,6 +32,7 @@ typedef struct
     int width;
     int height;
     SDL_Color color;
+    SDL_Rect img;
 }Tetrino;
 
 typedef struct
@@ -72,47 +71,54 @@ Tetrino block[7] ={{
     0,0,0,0,
     0,0,0,0,
     4,1,
-    0,255,255},{
+    0,255,255,255,
+    0,0,BOARD_S,BOARD_S},{
     START_X,START_Y,
     1,1,0,0,
     1,1,0,0,            //! Tvar O
     0,0,0,0,
     0,0,0,0,
     2,2,
-    255,255,0},{
+    255,255,0,255,
+    48,0,BOARD_S,BOARD_S},{
     START_X,START_Y,
     2,1,2,0,
     1,1,1,0,            //! Tvar T
     0,0,0,0,
     0,0,0,0,
     3,2,
-    128,0,128},{
+    128,0,128,255,
+    96,0,BOARD_S,BOARD_S},{
     START_X,START_Y,
     2,1,0,0,
     2,1,0,0,            //! Tvar J
     1,1,0,0,
     0,0,0,0,
     3,2,
-    0,0,255},{
+    0,0,255,255,
+    144,0,BOARD_S,BOARD_S},{
     START_X,START_Y,
     1,2,0,0,
     1,2,0,0,            //! Tvar L
     1,1,0,0,
     0,0,0,0,
     3,2,
-    255,165,0},{
+    255,165,0,255,
+    192,0,BOARD_S,BOARD_S},{
     START_X,START_Y,
     2,1,1,0,
     1,1,2,0,            //! Tvar S
     0,0,0,0,
     0,0,0,0,
     3,2,
-    78,252,78},{
+    78,252,78,255,
+    240,0,BOARD_S,BOARD_S},{
     START_X,START_Y,
     1,1,2,0,
     2,1,1,0,            //! Tvar Z
     0,0,0,0,
     0,0,0,0,
     3,2,
-    255,0,0}
+    255,0,0,255,
+    288,0,BOARD_S,BOARD_S}
     },cur,nextblock;
