@@ -6,7 +6,6 @@ void rotate_block(Tetrino *block);
 bool colision(Tetrino *block,Gameboard *board,int side);
 bool isseatled(Tetrino *block, Gameboard *board);
 void addseatledblock(Tetrino *block, Gameboard *board,float timer);
-void getfirstcord(Tetrino *block);
 void drawtetrino(int x, int y,SDL_Texture *texture,SDL_Rect img,SDL_Renderer *renderer);
 void drawgrid(Gameboard *board,Tetrino *block,SDL_Renderer *renderer, SDL_Texture *blocktexture);
 void grid_init(Tetrino *block,Gameboard *board);
@@ -92,7 +91,9 @@ int main()
             {
                 switch (e.key.keysym.sym){
                     case SDLK_UP:
-                        if(!colision(&cur,&board,3)) rotate_block(&cur);
+                        if(!colision(&cur,&board,3)){
+                            rotate_block(&cur);
+                        }
                         break;
                     case SDLK_DOWN:
                         if(!isseatled(&cur,&board)) cur.y += 1;
@@ -107,7 +108,8 @@ int main()
             }
             
         }
-        getfirstcord(block);
+
+
 
 
         if (secondsElapsed >0.5)
@@ -172,7 +174,6 @@ void rotate_block(Tetrino *block){
             block->shape[j][N - 1 - i] = temp;
         }
     }
-    printf("x1: %d y1: %d\n",block->x,block->y);
 }
 
 
@@ -218,7 +219,6 @@ bool isseatled(Tetrino *block, Gameboard *board){
         {
             if ((block->shape[i][j] == 1 && board->grid[blk.y + 1][blk.x] == 4) || (block->shape[i][j] == 1 && board->grid[blk.y + 1][blk.x] == 2))
             {
-                //printf("x: %d y: %d\n",block->x,block->y);
                 return true;
             } 
             blk.x++;
@@ -252,35 +252,6 @@ void addseatledblock(Tetrino *block, Gameboard *board,float timer){
 
 }
 
-
-void getfirstcord(Tetrino *block){
-    SDL_Rect blk;
-    blk.x = block->x;
-    blk.y = block->y;
-    int flag = 0;
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            if (block->shape[i][j] == 1 || block->shape[i][j] == 5 )
-            {
-                block->x = blk.x;
-                block->y = blk.y;
-                flag = 1;
-                break;
-            }
-            ++blk.x;
-        }
-        if (flag == 1)
-        {
-            break;
-        }
-        blk.y++;
-        blk.x = block->x;
-    }
-}
-
-
 void drawtetrino(int x, int y,SDL_Texture *texture,SDL_Rect img,SDL_Renderer *renderer){
     SDL_Rect rect = {x-1,y,BOARD_S,BOARD_S};
     SDL_RenderCopy(renderer,texture,&img,&rect);
@@ -302,7 +273,7 @@ void drawgrid(Gameboard *board,Tetrino *block,SDL_Renderer *renderer,SDL_Texture
     }    
 }
 
-void grid_init(Tetrino *block,Gameboard *board){
+void grid_init(Tetrino *block,Gameboard *board){    
     SDL_Rect blk;
     blk.x = block->x;
     blk.y = block->y;
@@ -311,7 +282,7 @@ void grid_init(Tetrino *block,Gameboard *board){
         for (int j = 0; j < 4; j++,blk.x++)
         {
             if (block->shape[i][j] == 1)
-            {
+            {   
                 board->grid[blk.y][blk.x] = block->shape[i][j];
             }
         }
@@ -321,9 +292,10 @@ void grid_init(Tetrino *block,Gameboard *board){
 
 void fullline(Gameboard *board,int *score,int *linecounter){
     int flag = 0;
+    int j;
     for (int i = 19; i > 0; i--)
     {
-        for (int j = 1; j <= BOARD_W; j++){
+        for (j = 1; j <= BOARD_W; j++){
             if (board->grid[i][j] != 2)
             {
                 flag = 0;
