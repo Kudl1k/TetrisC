@@ -14,7 +14,7 @@ void grid_init(Tetrino *block,Gameboard *board);
 void grid_reset(Gameboard *board);
 void fullline(Gameboard *board);
 void clearline(Gameboard *board,int line);
-void movedowngrid(Gameboard *board);
+void movedowngrid(Gameboard *board,int line);
 void drawnextblock(Tetrino *block,SDL_Renderer *renderer);
 bool gameover(Gameboard *board);
 
@@ -44,15 +44,17 @@ int main()
     int curnumber = rand() % 7;
     float secondsElapsed = 0;
     int nextnumber = rand() % 7;
+    
 
 
     cur = block[curnumber];
+    nextblock = block[nextnumber];
     int gamestage = 1;
     SDL_Event e;
     bool quit = false;
     while (!quit)
     {
-        printf("%d\n",nextnumber);
+        //printf("%d\n",nextnumber);
         Uint64 start = SDL_GetPerformanceCounter();
         while (SDL_PollEvent(&e))
         {
@@ -95,9 +97,10 @@ int main()
             addseatledblock(&cur,&board,secondsElapsed);
             fullline(&board);
             srand(time(0));
+            cur = nextblock;
             nextnumber = rand() % 7;
             nextblock = block[nextnumber];
-            cur = nextblock;
+
         }
 
         grid_reset(&board);
@@ -108,8 +111,8 @@ int main()
         
 
     
-        drawnextblock(&nextblock,renderer);
         drawgrid(&board,&cur,renderer);
+        drawnextblock(&nextblock,renderer);
         SDL_RenderPresent(renderer);
 
         Uint64 end = SDL_GetPerformanceCounter();
@@ -271,7 +274,7 @@ void drawtetrino(int x, int y,SDL_Color color,SDL_Renderer *renderer){
     SDL_Rect rect = {x-1,y,BOARD_S,BOARD_S};
     SDL_SetRenderDrawColor(renderer,color.r,color.g,color.b,255);
     SDL_RenderFillRect(renderer,&rect);
-    SDL_SetRenderDrawColor(renderer,255,255,255,255);
+    SDL_SetRenderDrawColor(renderer,0,0,0,255);
     SDL_RenderDrawRect(renderer,&rect);
 }
 
@@ -281,39 +284,35 @@ void drawgrid(Gameboard *board,Tetrino *block,SDL_Renderer *renderer){
     {
         for (int j = 1; j <= BOARD_W; j++)
         {
-            //printf("%d",board->grid[18][j]);
+            printf("%d",board->grid[i][j]);
             if (board->grid[i][j] == 0) drawtetrino(grid.x,grid.y,Grey,renderer);
             if (board->grid[i][j] == 1) drawtetrino(grid.x,grid.y,block->color,renderer);
             if (board->grid[i][j] == 2) drawtetrino(grid.x,grid.y,LightGrey,renderer);
             grid.x += BOARD_S;
         }
-        //printf("\n\n");
+        printf("\n");
         grid.x = 0;
         grid.y += BOARD_S;
     }
-    //printf("\n");
+    printf("\n\n");
     
 }
 
 void grid_init(Tetrino *block,Gameboard *board){
-    //printf("x: %d y: %d\n",block->x,block->y);
-    
     SDL_Rect blk;
     blk.x = block->x;
     blk.y = block->y;
-    
     for (int i = 0; i < 4; i++,blk.y++)
     {
         for (int j = 0; j < 4; j++,blk.x++)
         {
-            if (block->shape[i][j] == 1 && board->grid[blk.y][blk.x] == 0)
+            if (block->shape[i][j] == 1)
             {
                 board->grid[blk.y][blk.x] = block->shape[i][j];
             }
         }
         blk.x = block->x;
     }
-    
 }
 
 void fullline(Gameboard *board){
@@ -330,7 +329,7 @@ void fullline(Gameboard *board){
         }
         if (flag == 1) {
             clearline(board,i);
-            movedowngrid(board);
+            movedowngrid(board,i);
         }
     }
 }
@@ -343,8 +342,8 @@ void clearline(Gameboard *board,int line){
 
 }
 
-void movedowngrid(Gameboard *board){
-    for (int i = 19; i > 0; i--)
+void movedowngrid(Gameboard *board,int line){
+    for (int i = line; i > 0; i--)
     {
         for (int j = 1; j <= BOARD_W; j++)
         {
@@ -367,17 +366,23 @@ void grid_reset(Gameboard *board){
 
 void drawnextblock(Tetrino *block,SDL_Renderer *renderer){
     SDL_Rect next;
-    next.x = WINDOW_W+136;
-    next.y = 480;
-    next.h = next.w = 32;
+    next.x = 634;
+    next.y = 300;
+    next.h = next.w = 48;
     for (int i = 0; i < 4; i++)
     {
         for (int j = 0; j < 4; j++)
         {
-            if (block->shape[i][j]==1) drawtetrino(next.x,next.y,block->color,renderer);
+            if (block->shape[i][j]==1){
+                SDL_SetRenderDrawColor(renderer,block->color.r,block->color.g,block->color.b,255);
+                SDL_RenderFillRect(renderer,&next);
+                SDL_SetRenderDrawColor(renderer,0,0,0,255);
+                SDL_RenderDrawRect(renderer,&next);
+                
+            }
             next.x += next.w;
         }
-        next.x = 136;
+        next.x = 634;
         next.y += next.w;
     }
 }
