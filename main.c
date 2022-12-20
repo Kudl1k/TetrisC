@@ -41,9 +41,9 @@ int main()
     }
 
 
-    SDL_Texture *imgtexture = IMG_LoadTexture(renderer,"gameimg.png");
+    SDL_Texture *imgtexture = IMG_LoadTexture(renderer,"./src/gameimg.png");
     SDL_Rect wall = {0,0,880,960};
-    SDL_Texture *blocktexture = IMG_LoadTexture(renderer,"blocks.png");
+    SDL_Texture *blocktexture = IMG_LoadTexture(renderer,"./src/blocks.png");
 
     //* generace random block na startu
     srand(time(0));
