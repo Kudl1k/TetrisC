@@ -262,7 +262,7 @@ void getfirstcord(Tetrino *block){
     {
         for (int j = 0; j < 4; j++)
         {
-            if (block->shape[i][j] == 1 || block->shape[i][j] == 2 )
+            if (block->shape[i][j] == 1 || block->shape[i][j] == 5 )
             {
                 block->x = blk.x;
                 block->y = blk.y;
