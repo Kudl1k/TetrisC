@@ -4,6 +4,7 @@
 
 void rotate_block(Tetrino *block);
 bool colision(Tetrino *block,Gameboard *board,int side);
+bool canrotate(Tetrino *block, Gameboard *board);
 bool isseatled(Tetrino *block, Gameboard *board);
 void addseatledblock(Tetrino *block, Gameboard *board,float timer);
 void getfirstcord(Tetrino *block);
@@ -16,7 +17,7 @@ void fullline(Gameboard *board);
 void clearline(Gameboard *board,int line);
 void movedowngrid(Gameboard *board);
 void drawnextblock(Tetrino *block,SDL_Renderer *renderer);
-
+bool gameover(Gameboard *board);
 
 
 int main()
@@ -52,6 +53,7 @@ int main()
     bool quit = false;
     while (!quit)
     {
+        printf("%d\n",blknumber);
         Uint64 start = SDL_GetPerformanceCounter();
         while (SDL_PollEvent(&e))
         {
@@ -63,7 +65,7 @@ int main()
             {
                 switch (e.key.keysym.sym){
                     case SDLK_UP:
-                        if(!colision(&cur,&board,1) || !colision(&cur,&board,2)) rotate_block(&cur);
+                        if(!canrotate(&cur,&board)) rotate_block(&cur);
                         break;
                     case SDLK_DOWN:
                         if(!isseatled(&cur,&board)) cur.y += 1;
@@ -74,8 +76,6 @@ int main()
                     case SDLK_RIGHT:
                         if(!colision(&cur, &board,1)) cur.x += 1;
                         break;
-                    case SDLK_r:
-                        cur = block[blknumber];
                 }
             }
             
@@ -92,9 +92,10 @@ int main()
         
         if (isseatled(&cur,&board))
         {
-            
+            if (gameover(&board)) quit = true;
             addseatledblock(&cur,&board,secondsElapsed);
             fullline(&board);
+            srand(time(0));
             blknumber = rand() % 7;
             nextblock = block[blknumber];
             cur = nextblock;
@@ -108,9 +109,8 @@ int main()
         
 
     
-
+        //drawnextblock(&nextblock,renderer);
         drawgrid(&board,&cur,renderer);
-        drawnextblock(&nextblock,renderer);
         SDL_RenderPresent(renderer);
 
         Uint64 end = SDL_GetPerformanceCounter();
@@ -164,6 +164,30 @@ bool colision(Tetrino *block,Gameboard *board,int side){
             blk.x++;
         }
         blk.x = block->x;
+        blk.y++;
+    }
+    return false;
+}
+
+bool canrotate(Tetrino *block, Gameboard *board){
+    Tetrino *try = block;
+    rotate_block(try);
+    getfirstcord(try);
+    SDL_Rect blk;
+    blk.x = try->x;
+    blk.y = try->y;
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            if (try->shape[i][j] == 1 && board->grid[blk.x][blk.y] == 3)
+            {
+                return true;
+
+            }
+            blk.x++;
+        }
+        blk.x = try->x;
         blk.y++;
     }
     return false;
@@ -369,10 +393,22 @@ void drawnextblock(Tetrino *block,SDL_Renderer *renderer){
     {
         for (int j = 0; j < 4; j++)
         {
-            drawtetrino(next.x,next.y,block->color,renderer);
-            next.x += 32;
+            if (block->shape[i][j]==1) drawtetrino(next.x,next.y,block->color,renderer);
+            next.x += next.w;
         }
         next.x = 136;
-        next.y += 32;
+        next.y += next.w;
     }
+}
+
+bool gameover(Gameboard *board){
+    for (int j = 1; j <= BOARD_W; j++)
+    {
+        if (board->grid[3][j] == 2)
+        {
+            return true;
+        }
+        
+    }
+    return false;
 }
