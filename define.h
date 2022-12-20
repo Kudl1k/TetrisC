@@ -23,6 +23,9 @@
 //* Definice barev
 SDL_Rect Grey = {336,0,BOARD_S,BOARD_S};
 SDL_Rect LightGrey = {384,0,BOARD_S,BOARD_S};
+SDL_Color White = {255,255,255,255};
+char scoretext[10000];
+char linetext[1000];
 
 //* Definice Tetrinů
 typedef struct
