@@ -4,7 +4,6 @@
 
 void rotate_block(Tetrino *block);
 bool colision(Tetrino *block,Gameboard *board,int side);
-bool canrotate(Tetrino *block, Gameboard *board);
 bool isseatled(Tetrino *block, Gameboard *board);
 void addseatledblock(Tetrino *block, Gameboard *board,float timer);
 void getfirstcord(Tetrino *block);
@@ -42,18 +41,18 @@ int main()
     }
     //* generace random block na startu
     srand(time(0));
-    int blknumber = rand() % 7;
-    
+    int curnumber = rand() % 7;
     float secondsElapsed = 0;
+    int nextnumber = rand() % 7;
 
 
-    cur = block[blknumber];
+    cur = block[curnumber];
     int gamestage = 1;
     SDL_Event e;
     bool quit = false;
     while (!quit)
     {
-        printf("%d\n",blknumber);
+        printf("%d\n",nextnumber);
         Uint64 start = SDL_GetPerformanceCounter();
         while (SDL_PollEvent(&e))
         {
@@ -65,7 +64,7 @@ int main()
             {
                 switch (e.key.keysym.sym){
                     case SDLK_UP:
-                        if(!canrotate(&cur,&board)) rotate_block(&cur);
+                        if(!colision(&cur,&board,3)) rotate_block(&cur);
                         break;
                     case SDLK_DOWN:
                         if(!isseatled(&cur,&board)) cur.y += 1;
@@ -96,8 +95,8 @@ int main()
             addseatledblock(&cur,&board,secondsElapsed);
             fullline(&board);
             srand(time(0));
-            blknumber = rand() % 7;
-            nextblock = block[blknumber];
+            nextnumber = rand() % 7;
+            nextblock = block[nextnumber];
             cur = nextblock;
         }
 
@@ -109,7 +108,7 @@ int main()
         
 
     
-        //drawnextblock(&nextblock,renderer);
+        drawnextblock(&nextblock,renderer);
         drawgrid(&board,&cur,renderer);
         SDL_RenderPresent(renderer);
 
@@ -160,6 +159,11 @@ bool colision(Tetrino *block,Gameboard *board,int side){
             {
                 return true;
             }
+            if ((board->grid[blk.y][blk.x - 1] == 3 || board->grid[blk.y][blk.x + 1] == 3) && side == 3)
+            {
+                return true;
+            }
+            
             
             blk.x++;
         }
@@ -169,29 +173,6 @@ bool colision(Tetrino *block,Gameboard *board,int side){
     return false;
 }
 
-bool canrotate(Tetrino *block, Gameboard *board){
-    Tetrino *try = block;
-    rotate_block(try);
-    getfirstcord(try);
-    SDL_Rect blk;
-    blk.x = try->x;
-    blk.y = try->y;
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            if (try->shape[i][j] == 1 && board->grid[blk.x][blk.y] == 3)
-            {
-                return true;
-
-            }
-            blk.x++;
-        }
-        blk.x = try->x;
-        blk.y++;
-    }
-    return false;
-}
 
 bool isseatled(Tetrino *block, Gameboard *board){
     SDL_Rect blk;
