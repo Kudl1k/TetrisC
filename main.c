@@ -16,6 +16,8 @@ void fullline(Gameboard *board);
 void clearline(Gameboard *board,int line);
 void movedowngrid(Gameboard *board);
 
+
+
 int main()
 {
     if (SDL_Init(SDL_INIT_VIDEO)) {
@@ -92,14 +94,16 @@ int main()
             cur = nextblock;
         }
 
-        grid_reset(&board);
-        grid_init(&cur,&board);
+        //grid_reset(&board);
+        //grid_init(&cur,&board);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         
 
-        drawgrid(&board,&cur,renderer);
+    
+
+        //drawgrid(&board,&cur,renderer);
 
         SDL_RenderPresent(renderer);
 
@@ -116,7 +120,19 @@ int main()
 
 //! pomocne funkce
 
+
+
 void rotate_block(Tetrino *block){
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            printf("%d",block->shape[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+
     int N = 4;
     for (int i = 0; i < N / 2; i++) {
         for (int j = i; j < N - i - 1; j++) {
@@ -127,7 +143,17 @@ void rotate_block(Tetrino *block){
             block->shape[j][N - 1 - i] = temp;
         }
     }
-    getfirstcord(block);
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            printf("%d",block->shape[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n\n");
+
+    
 }
 
 
@@ -169,7 +195,7 @@ bool isseatled(Tetrino *block, Gameboard *board){
         {
             if ((block->shape[i][j] == 1 && board->grid[blk.y + 1][blk.x] == 3) || (block->shape[i][j] == 1 && board->grid[blk.y + 1][blk.x] == 2))
             {
-                printf("x: %d y: %d\n",block->x,block->y);
+                //printf("x: %d y: %d\n",block->x,block->y);
                 return true;
             } 
             blk.x++;
@@ -282,6 +308,7 @@ void drawgrid(Gameboard *board,Tetrino *block,SDL_Renderer *renderer){
 void grid_init(Tetrino *block,Gameboard *board){
 
     getfirstcord(block);
+    //printf("x: %d y: %d\n",block->x,block->y);
     SDL_Rect blk;
     blk.x = block->x;
     blk.y = block->y;
