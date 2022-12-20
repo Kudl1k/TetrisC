@@ -12,8 +12,8 @@ void drawtetrino(int x, int y,SDL_Color color,SDL_Renderer *renderer);
 void drawgrid(Gameboard *board,Tetrino *block,SDL_Renderer *renderer);
 void grid_init(Tetrino *block,Gameboard *board);
 void grid_reset(Gameboard *board);
-bool fullline(Gameboard *board);
-void clearline(Gameboard *board);
+void fullline(Gameboard *board);
+void clearline(Gameboard *board,int line);
 void movedowngrid(Gameboard *board);
 
 int main()
@@ -62,10 +62,8 @@ int main()
                 switch (e.key.keysym.sym){
                     case SDLK_UP:
                         rotate_block(&cur);
-                        grid_reset(&board);
                         break;
                     case SDLK_DOWN:
-
                         if(!isseatled(&cur,&board)) cur.y += 1;
                         break;
                     case SDLK_LEFT:
@@ -89,23 +87,17 @@ int main()
         if (isseatled(&cur,&board))
         {
             addseatledblock(&cur,&board);
+            fullline(&board);
             nextblock = block[1];
             cur = nextblock;
         }
-        if (fullline(&board))
-        {
-            printf("true");
-            clearline(&board);
-            movedowngrid(&board);
-        }
-        
-        
 
+        grid_reset(&board);
+        grid_init(&cur,&board);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
-        grid_reset(&board);
-        grid_init(&cur,&board);
+        
 
         drawgrid(&board,&cur,renderer);
 
@@ -135,6 +127,7 @@ void rotate_block(Tetrino *block){
             block->shape[j][N - 1 - i] = temp;
         }
     }
+    getfirstcord(block);
 }
 
 
@@ -309,36 +302,35 @@ void grid_init(Tetrino *block,Gameboard *board){
     
 }
 
-bool fullline(Gameboard *board){
+void fullline(Gameboard *board){
     int flag = 0;
     for (int i = 19; i > 0; i--)
     {
         for (int j = 1; j <= BOARD_W; j++){
-            if (board->grid[18][j] != 2)
+            if (board->grid[i][j] != 2)
             {
                 flag = 0;
-                continue;
+                break;
             }
-            else flag = 0;
+            flag = 1;
         }
-
+        if (flag == 1) {
+            clearline(board,i);
+            movedowngrid(board);
+        }
     }
-    if (flag == 0) return false;
-    if (flag == 1) return true;
 }
 
-void clearline(Gameboard *board){
-    for (int i = 0; i < BOARD_H; i++)
+void clearline(Gameboard *board,int line){
+    for (int j = 1; j <= BOARD_W; j++)
     {
-        for (int j = 1; j <= BOARD_W; j++)
-        {
-            board->grid[i][j] = 0;
-        }
+        board->grid[line][j] = 0;
     }
+
 }
 
 void movedowngrid(Gameboard *board){
-    for (int i = 19; i >= 0; i--)
+    for (int i = 19; i > 0; i--)
     {
         for (int j = 1; j <= BOARD_W; j++)
         {
