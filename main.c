@@ -12,7 +12,7 @@ void drawtetrino(int x, int y,SDL_Texture *texture,SDL_Rect img,SDL_Renderer *re
 void drawgrid(Gameboard *board,Tetrino *block,SDL_Renderer *renderer, SDL_Texture *blocktexture);
 void grid_init(Tetrino *block,Gameboard *board);
 void grid_reset(Gameboard *board);
-void fullline(Gameboard *board);
+void fullline(Gameboard *board,int *score,int *linecounter);
 void clearline(Gameboard *board,int line);
 void movedowngrid(Gameboard *board,int line);
 void drawnextblock(Tetrino *block,SDL_Renderer *renderer,SDL_Texture *blocktexture);
@@ -56,11 +56,12 @@ int main()
     cur = block[curnumber];
     nextblock = block[nextnumber];
     int gamestage = 1;
+    int linecounter = 0;
+    int score = 0;
     SDL_Event e;
     bool quit = false;
     while (!quit)
     {
-        //printf("%d\n",nextnumber);
         Uint64 start = SDL_GetPerformanceCounter();
         while (SDL_PollEvent(&e))
         {
@@ -97,20 +98,20 @@ int main()
             secondsElapsed = 0;
         }
         
+        grid_reset(&board);
+        grid_init(&cur,&board);
+
         if (isseatled(&cur,&board))
         {
             if (gameover(&board)) quit = true;
             addseatledblock(&cur,&board,secondsElapsed);
-            fullline(&board);
+            fullline(&board,&score,&linecounter);
             srand(time(0));
             cur = nextblock;
             nextnumber = rand() % 7;
             nextblock = block[nextnumber];
 
         }
-
-        grid_reset(&board);
-        grid_init(&cur,&board);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
@@ -287,18 +288,14 @@ void drawgrid(Gameboard *board,Tetrino *block,SDL_Renderer *renderer,SDL_Texture
     {
         for (int j = 1; j <= BOARD_W; j++)
         {
-            printf("%d",board->grid[i][j]);
             if (board->grid[i][j] == 0) drawtetrino(grid.x,grid.y,blocktexture,Grey,renderer);
             if (board->grid[i][j] == 1) drawtetrino(grid.x,grid.y,blocktexture,block->img,renderer);
             if (board->grid[i][j] == 2) drawtetrino(grid.x,grid.y,blocktexture,LightGrey,renderer);
             grid.x += BOARD_S;
         }
-        printf("\n");
         grid.x = 0;
         grid.y += BOARD_S;
-    }
-    printf("\n\n");
-    
+    }    
 }
 
 void grid_init(Tetrino *block,Gameboard *board){
@@ -318,7 +315,7 @@ void grid_init(Tetrino *block,Gameboard *board){
     }
 }
 
-void fullline(Gameboard *board){
+void fullline(Gameboard *board,int *score,int *linecounter){
     int flag = 0;
     for (int i = 19; i > 0; i--)
     {
@@ -331,6 +328,8 @@ void fullline(Gameboard *board){
             flag = 1;
         }
         if (flag == 1) {
+            (*score) += 100;
+            (*linecounter) += 1;
             clearline(board,i);
             movedowngrid(board,i);
         }
