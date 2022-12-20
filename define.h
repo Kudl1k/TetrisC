@@ -15,7 +15,7 @@
 #define WINDOW_W BOARD_S*BOARD_W
 #define WINDOW_H BOARD_S*BOARD_H
 
-#define START_X 3
+#define START_X 1
 #define START_Y 0
 
 //* Definice barev
