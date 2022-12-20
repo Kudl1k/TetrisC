@@ -201,7 +201,7 @@ bool isseatled(Tetrino *block, Gameboard *board){
     {
         for (int j = 0; j < 4; j++)
         {
-            if ((block->shape[i][j] == 1 && board->grid[blk.y + 1][blk.x] == 3) || (block->shape[i][j] == 1 && board->grid[blk.y + 1][blk.x] == 2))
+            if ((block->shape[i][j] == 1 && board->grid[blk.y + 1][blk.x] == 4) || (block->shape[i][j] == 1 && board->grid[blk.y + 1][blk.x] == 2))
             {
                 //printf("x: %d y: %d\n",block->x,block->y);
                 return true;
