@@ -1,35 +1,79 @@
 #include "define.h"
 
+//! game
+SDL_Window* window;
+SDL_Renderer* renderer;
+TTF_Font* font;
+bool quit = false;
 
+SDL_Texture *imgtexture;
+SDL_Texture *blocktexture;
+SDL_Rect wall = {0,0,880,960};
+SDL_Rect scorerect = {691,193,128,40};
+SDL_Rect linesrect = {691,261,128,40};
+int curnumber = 0;
+int nextnumber = 0;
+float secondsElapsed = 0;
+int linecounter = 0;
+int score = 0;
+SDL_Event e;
+
+SDL_Surface* scoresurface;
+SDL_Texture* scoretexture;
+SDL_Surface* linesurface;
+SDL_Texture* linetexture;
+
+
+
+//! game.h
+void init();
+void gameinit();
+void input();
+void game();
+void rendergame();
+void destroy();
+void tetris();
+//! movement.h
 void rotate_block(Tetrino *block);
 bool colision(Tetrino *block,Gameboard *board,int side);
-bool isseatled(Tetrino *block, Gameboard *board);
+bool issettled(Tetrino *block, Gameboard *board);
 void addseatledblock(Tetrino *block, Gameboard *board,float timer);
+//! drawing.h
+void drawnextblock(Tetrino *block,SDL_Renderer *renderer,SDL_Texture *blocktexture);
 void drawtetrino(int x, int y,SDL_Texture *texture,SDL_Rect img,SDL_Renderer *renderer);
 void drawgrid(Gameboard *board,Tetrino *block,SDL_Renderer *renderer, SDL_Texture *blocktexture);
+//! grid.h
 void grid_init(Tetrino *block,Gameboard *board);
 void grid_reset(Gameboard *board);
 void fullline(Gameboard *board,int *score,int *linecounter);
 void clearline(Gameboard *board,int line);
 void movedowngrid(Gameboard *board,int line);
-void drawnextblock(Tetrino *block,SDL_Renderer *renderer,SDL_Texture *blocktexture);
+
+//! ...
 bool gameover(Gameboard *board);
+
 
 
 int main()
 {
+    tetris();
+    return 0;
+}
+
+//! game.h
+void init(){
     if (SDL_Init(SDL_INIT_VIDEO)) {
         fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
         exit(1);
     }
-    SDL_Window* window = SDL_CreateWindow("TETRIS - KUD0132", 50, 50, 880, 960, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow("TETRIS - KUD0132", 50, 50, 880, 960, SDL_WINDOW_SHOWN);
     if (!window) {
         fprintf(stderr, "SDL_CreateWindow Error: %s\n", SDL_GetError());
         SDL_Quit();
         exit(1);
     }
 
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (!renderer) {
         SDL_DestroyWindow(window);
         fprintf(stderr, "SDL_CreateRenderer Error: %s", SDL_GetError());
@@ -39,7 +83,7 @@ int main()
 
         TTF_Init();
 
-    TTF_Font* font = TTF_OpenFont("./src/retrogaming.ttf", 24);
+    font = TTF_OpenFont("./src/retrogaming.ttf", 24);
     if (!font)
     {
         SDL_DestroyWindow(window);
@@ -47,39 +91,20 @@ int main()
         SDL_Quit();
         exit(1);
     }
-    SDL_Texture *imgtexture = IMG_LoadTexture(renderer,"./src/gameimg.png");
-    SDL_Texture *blocktexture = IMG_LoadTexture(renderer,"./src/blocks.png");
+}
 
-    SDL_Rect wall = {0,0,880,960};
-    SDL_Rect scorerect = {691,193,128,40};
-    SDL_Rect linesrect = {691,261,128,40};
-
-    //* generace random block na startu
+void gameinit(){
+    blocktexture = IMG_LoadTexture(renderer,"./src/blocks.png");
+    imgtexture = IMG_LoadTexture(renderer,"./src/gameimg.png");
     srand(time(0));
-    int curnumber = rand() % 7;
-    float secondsElapsed = 0;
-    int nextnumber = rand() % 7;
-
-    int linecounter = 0;
-    int score = 0;
-    
-
-
-
+    curnumber = rand() % 7;
     cur = block[curnumber];
+    nextnumber = rand() % 7;
     nextblock = block[nextnumber];
-    int gamestage = 1;
-    SDL_Event e;
-    bool quit = false;
-    while (!quit)
-    {
-        SDL_Surface* scoresurface = TTF_RenderText_Solid(font,  scoretext, White);
-        SDL_Texture* scoretexture = SDL_CreateTextureFromSurface(renderer, scoresurface);
-        SDL_FreeSurface(scoresurface);
-        sprintf(scoretext,"%d",score);
+}
 
-        Uint64 start = SDL_GetPerformanceCounter();
-        while (SDL_PollEvent(&e))
+void input(){
+    while (SDL_PollEvent(&e))
         {
             if (e.type == SDL_QUIT)
             {
@@ -94,7 +119,7 @@ int main()
                         }
                         break;
                     case SDLK_DOWN:
-                        if(!isseatled(&cur,&board)) cur.y += 1;
+                        if(!issettled(&cur,&board)) cur.y += 1;
                         break;
                     case SDLK_LEFT:
                         if(!colision(&cur, &board,2)) cur.x -= 1;
@@ -106,11 +131,10 @@ int main()
             }
             
         }
+}
 
-
-
-
-        if (secondsElapsed >0.5)
+void game(){
+    if (secondsElapsed >0.5)
         {
             cur.y += 1;       //! posunovac
             secondsElapsed = 0;
@@ -119,48 +143,66 @@ int main()
         grid_reset(&board);
         grid_init(&cur,&board);
 
-        if (isseatled(&cur,&board))
+        if (issettled(&cur,&board))
         {
             if (gameover(&board)) quit = true;
             addseatledblock(&cur,&board,secondsElapsed);
             fullline(&board,&score,&linecounter);
-            srand(time(0));
             cur = nextblock;
+            srand(time(0));
             nextnumber = rand() % 7;
             nextblock = block[nextnumber];
             sprintf(scoretext,"%d",score);
-
         }
-        
+}
 
+
+void rendergame(){
+        scoresurface = TTF_RenderText_Solid(font,  scoretext, White);
+        scoretexture = SDL_CreateTextureFromSurface(renderer, scoresurface);
+        SDL_FreeSurface(scoresurface);
+        sprintf(scoretext,"%d",score);
+        linesurface = TTF_RenderText_Solid(font,  linetext, White);
+        linetexture = SDL_CreateTextureFromSurface(renderer, linesurface);
+        SDL_FreeSurface(linesurface);
+        sprintf(linetext,"%d",linecounter);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer,imgtexture,NULL,NULL);
         SDL_RenderCopy(renderer,scoretexture,NULL,&scorerect);
-        
-
-
+        SDL_RenderCopy(renderer,linetexture,NULL,&linesrect);
         drawgrid(&board,&cur,renderer,blocktexture);
         drawnextblock(&nextblock,renderer,blocktexture);
         SDL_RenderPresent(renderer);
+}
 
-        Uint64 end = SDL_GetPerformanceCounter();
-        secondsElapsed = secondsElapsed + ( (end - start) / (float)SDL_GetPerformanceFrequency());
-    }
+void destroy(){
     TTF_CloseFont(font);
     SDL_DestroyTexture(blocktexture);
     SDL_DestroyTexture(imgtexture);
+    SDL_DestroyTexture(scoretexture);
+    SDL_DestroyTexture(linetexture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
-
-    return 0;
 }
 
-//! pomocne funkce
+void tetris(){
+    init();
+    gameinit();
+    while (!quit)
+    {
+        Uint64 start = SDL_GetPerformanceCounter();
+        input();
+        game();
+        rendergame();
+        Uint64 end = SDL_GetPerformanceCounter();
+        secondsElapsed = secondsElapsed + ( (end - start) / (float)SDL_GetPerformanceFrequency());
+    }
+    destroy();
+}
 
-
-
+//! movement.h
 void rotate_block(Tetrino *block){
     int N = 4;
     for (int i = 0; i < N / 2; i++) {
@@ -173,8 +215,6 @@ void rotate_block(Tetrino *block){
         }
     }
 }
-
-
 
 bool colision(Tetrino *block,Gameboard *board,int side){
     SDL_Rect blk;
@@ -207,7 +247,7 @@ bool colision(Tetrino *block,Gameboard *board,int side){
 }
 
 
-bool isseatled(Tetrino *block, Gameboard *board){
+bool issettled(Tetrino *block, Gameboard *board){
     SDL_Rect blk;
     blk.x = block->x;
     blk.y = block->y;
@@ -250,26 +290,9 @@ void addseatledblock(Tetrino *block, Gameboard *board,float timer){
 
 }
 
-void drawtetrino(int x, int y,SDL_Texture *texture,SDL_Rect img,SDL_Renderer *renderer){
-    SDL_Rect rect = {x-1,y,BOARD_S,BOARD_S};
-    SDL_RenderCopy(renderer,texture,&img,&rect);
-}
 
-void drawgrid(Gameboard *board,Tetrino *block,SDL_Renderer *renderer,SDL_Texture *blocktexture){
-    SDL_Rect grid = {0,0,0,0};
-    for (int i = 0; i < BOARD_H; i++)
-    {
-        for (int j = 1; j <= BOARD_W; j++)
-        {
-            if (board->grid[i][j] == 0) drawtetrino(grid.x,grid.y,blocktexture,Grey,renderer);
-            if (board->grid[i][j] == 1) drawtetrino(grid.x,grid.y,blocktexture,block->img,renderer);
-            if (board->grid[i][j] == 2) drawtetrino(grid.x,grid.y,blocktexture,LightGrey,renderer);
-            grid.x += BOARD_S;
-        }
-        grid.x = 0;
-        grid.y += BOARD_S;
-    }    
-}
+//! grid.h
+
 
 void grid_init(Tetrino *block,Gameboard *board){    
     SDL_Rect blk;
@@ -358,6 +381,30 @@ void drawnextblock(Tetrino *block,SDL_Renderer *renderer,SDL_Texture *blocktextu
         next.y += next.w;
     }
 }
+
+void drawtetrino(int x, int y,SDL_Texture *texture,SDL_Rect img,SDL_Renderer *renderer){
+    SDL_Rect rect = {x-1,y,BOARD_S,BOARD_S};
+    SDL_RenderCopy(renderer,texture,&img,&rect);
+}
+
+void drawgrid(Gameboard *board,Tetrino *block,SDL_Renderer *renderer,SDL_Texture *blocktexture){
+    SDL_Rect grid = {0,0,0,0};
+    for (int i = 0; i < BOARD_H; i++)
+    {
+        for (int j = 1; j <= BOARD_W; j++)
+        {
+            if (board->grid[i][j] == 0) drawtetrino(grid.x,grid.y,blocktexture,Grey,renderer);
+            if (board->grid[i][j] == 1) drawtetrino(grid.x,grid.y,blocktexture,block->img,renderer);
+            if (board->grid[i][j] == 2) drawtetrino(grid.x,grid.y,blocktexture,LightGrey,renderer);
+            grid.x += BOARD_S;
+        }
+        grid.x = 0;
+        grid.y += BOARD_S;
+    }    
+}
+
+//! ...
+
 
 bool gameover(Gameboard *board){
     for (int j = 1; j <= BOARD_W; j++)

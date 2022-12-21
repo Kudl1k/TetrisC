@@ -11,13 +11,6 @@
 #include <time.h>
 
 
-SDL_Renderer* renderer;
-SDL_Window* window;
-TTF_Font* font;
-SDL_Texture *imgtexture;
-SDL_Texture *blocktexture;
-
-
 #define RUNNING 1
 #define SEATLED 2
 
