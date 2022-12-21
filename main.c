@@ -1,5 +1,6 @@
 #include "define.h"
 
+
 //! game
 SDL_Window* window;
 SDL_Renderer* renderer;
@@ -8,12 +9,17 @@ bool quit = false;
 
 SDL_Texture *imgtexture;
 SDL_Texture *blocktexture;
+SDL_Texture *mainmenu;
+SDL_Texture *options;
+SDL_Texture *info;
+
 SDL_Rect wall = {0,0,880,960};
 SDL_Rect scorerect = {691,193,128,40};
 SDL_Rect linesrect = {691,261,128,40};
 int curnumber = 0;
 int nextnumber = 0;
 float secondsElapsed = 0;
+float timer = 0.5;
 int linecounter = 0;
 int score = 0;
 SDL_Event e;
@@ -96,6 +102,10 @@ void init(){
 void gameinit(){
     blocktexture = IMG_LoadTexture(renderer,"./src/blocks.png");
     imgtexture = IMG_LoadTexture(renderer,"./src/gameimg.png");
+    mainmenu = IMG_LoadTexture(renderer,"./src/mainmenu.png");
+    options = IMG_LoadTexture(renderer,"./src/options.png");
+    info = IMG_LoadTexture(renderer,"./src/info.png");
+
     srand(time(0));
     curnumber = rand() % 7;
     cur = block[curnumber];
@@ -110,7 +120,7 @@ void input(){
             {
                 quit = true;
             }
-            if (e.type == SDL_KEYDOWN)
+            if (e.type == SDL_KEYDOWN && gamestate == 1)
             {
                 switch (e.key.keysym.sym){
                     case SDLK_UP:
@@ -134,7 +144,7 @@ void input(){
 }
 
 void game(){
-    if (secondsElapsed >0.5)
+    if (secondsElapsed >timer)
         {
             cur.y += 1;       //! posunovac
             secondsElapsed = 0;
@@ -145,7 +155,10 @@ void game(){
 
         if (issettled(&cur,&board))
         {
-            if (gameover(&board)) quit = true;
+            if (gameover(&board)) {
+                gamestate = 2;
+                quit = true;
+            }
             addseatledblock(&cur,&board,secondsElapsed);
             fullline(&board,&score,&linecounter);
             cur = nextblock;
@@ -158,22 +171,26 @@ void game(){
 
 
 void rendergame(){
-        scoresurface = TTF_RenderText_Solid(font,  scoretext, White);
-        scoretexture = SDL_CreateTextureFromSurface(renderer, scoresurface);
-        SDL_FreeSurface(scoresurface);
-        sprintf(scoretext,"%d",score);
-        linesurface = TTF_RenderText_Solid(font,  linetext, White);
-        linetexture = SDL_CreateTextureFromSurface(renderer, linesurface);
-        SDL_FreeSurface(linesurface);
-        sprintf(linetext,"%d",linecounter);
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer,imgtexture,NULL,NULL);
-        SDL_RenderCopy(renderer,scoretexture,NULL,&scorerect);
-        SDL_RenderCopy(renderer,linetexture,NULL,&linesrect);
-        drawgrid(&board,&cur,renderer,blocktexture);
-        drawnextblock(&nextblock,renderer,blocktexture);
-        SDL_RenderPresent(renderer);
+    scoresurface = TTF_RenderText_Solid(font,  scoretext, White);
+    scoretexture = SDL_CreateTextureFromSurface(renderer, scoresurface);
+    SDL_FreeSurface(scoresurface);
+    sprintf(scoretext,"%d",score);
+    linesurface = TTF_RenderText_Solid(font,  linetext, White);
+    linetexture = SDL_CreateTextureFromSurface(renderer, linesurface);
+    SDL_FreeSurface(linesurface);
+    sprintf(linetext,"%d",linecounter);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer,imgtexture,NULL,NULL);
+    SDL_RenderCopy(renderer,scoretexture,NULL,&scorerect);
+    SDL_RenderCopy(renderer,linetexture,NULL,&linesrect);
+    drawgrid(&board,&cur,renderer,blocktexture);
+    drawnextblock(&nextblock,renderer,blocktexture);
+    SDL_RenderPresent(renderer);
+}
+
+void rendermainmenu(){
+    SDL_RenderCopy(renderer,mainmenu,NULL,NULL);
 }
 
 void destroy(){
@@ -182,6 +199,9 @@ void destroy(){
     SDL_DestroyTexture(imgtexture);
     SDL_DestroyTexture(scoretexture);
     SDL_DestroyTexture(linetexture);
+    SDL_DestroyTexture(mainmenu);
+    SDL_DestroyTexture(options);
+    SDL_DestroyTexture(info);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -192,12 +212,18 @@ void tetris(){
     gameinit();
     while (!quit)
     {
-        Uint64 start = SDL_GetPerformanceCounter();
         input();
-        game();
-        rendergame();
-        Uint64 end = SDL_GetPerformanceCounter();
-        secondsElapsed = secondsElapsed + ( (end - start) / (float)SDL_GetPerformanceFrequency());
+        if (gamestate == 0){
+            
+        }
+        if(gamestate == 1){
+            Uint64 start = SDL_GetPerformanceCounter();
+            game();
+            rendergame();
+            Uint64 end = SDL_GetPerformanceCounter();
+            secondsElapsed = secondsElapsed + ( (end - start) / (float)SDL_GetPerformanceFrequency());
+        }
+        
     }
     destroy();
 }
@@ -413,7 +439,6 @@ bool gameover(Gameboard *board){
         {
             return true;
         }
-        
     }
     return false;
 }
