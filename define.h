@@ -1,12 +1,22 @@
-#ifndef define
-#define define
+#ifndef DEFINE_H
+#define DEFINE_H
 
+
+#pragma once
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 #include <time.h>
+
+
+SDL_Renderer* renderer;
+SDL_Window* window;
+TTF_Font* font;
+SDL_Texture *imgtexture;
+SDL_Texture *blocktexture;
+
 
 #define RUNNING 1
 #define SEATLED 2
@@ -113,4 +123,5 @@ Tetrino block[7] ={{
     0,0,0,0,
     288,0,BOARD_S,BOARD_S}
     },cur,nextblock;
+
 #endif

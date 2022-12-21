@@ -1,5 +1,4 @@
 #include "define.h"
-#include "init.h"
 
 
 void rotate_block(Tetrino *block);
@@ -19,7 +18,37 @@ bool gameover(Gameboard *board);
 
 int main()
 {
-    init();
+    if (SDL_Init(SDL_INIT_VIDEO)) {
+        fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
+        exit(1);
+    }
+    SDL_Window* window = SDL_CreateWindow("TETRIS - KUD0132", 50, 50, 880, 960, SDL_WINDOW_SHOWN);
+    if (!window) {
+        fprintf(stderr, "SDL_CreateWindow Error: %s\n", SDL_GetError());
+        SDL_Quit();
+        exit(1);
+    }
+
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if (!renderer) {
+        SDL_DestroyWindow(window);
+        fprintf(stderr, "SDL_CreateRenderer Error: %s", SDL_GetError());
+        SDL_Quit();
+        exit(1);
+    }
+
+        TTF_Init();
+
+    TTF_Font* font = TTF_OpenFont("./src/retrogaming.ttf", 24);
+    if (!font)
+    {
+        SDL_DestroyWindow(window);
+        fprintf(stderr, "TTF_OpenFont Error: %s", SDL_GetError());
+        SDL_Quit();
+        exit(1);
+    }
+    SDL_Texture *imgtexture = IMG_LoadTexture(renderer,"./src/gameimg.png");
+    SDL_Texture *blocktexture = IMG_LoadTexture(renderer,"./src/blocks.png");
 
     SDL_Rect wall = {0,0,880,960};
     SDL_Rect scorerect = {691,193,128,40};
@@ -118,7 +147,12 @@ int main()
         Uint64 end = SDL_GetPerformanceCounter();
         secondsElapsed = secondsElapsed + ( (end - start) / (float)SDL_GetPerformanceFrequency());
     }
-    destroy();
+    TTF_CloseFont(font);
+    SDL_DestroyTexture(blocktexture);
+    SDL_DestroyTexture(imgtexture);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 
     return 0;
 }

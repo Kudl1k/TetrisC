@@ -5,6 +5,7 @@
         "init.h": "c",
         "define.h": "c",
         "sdl.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "sdl_ttf.h": "c"
     }
 }
