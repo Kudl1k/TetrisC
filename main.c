@@ -5,6 +5,8 @@
 SDL_Window* window;
 SDL_Renderer* renderer;
 TTF_Font* font;
+
+
 bool quit = false;
 SDL_Point mousepos;
 const SDL_Rect startbox = {271,410,338,78};
@@ -98,6 +100,10 @@ void init(){
         fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
         exit(1);
     }
+    if (SDL_Init(SDL_INIT_AUDIO)) {
+        fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
+        exit(1);
+    }
     window = SDL_CreateWindow("TETRIS - KUD0132", 50, 50, 880, 960, SDL_WINDOW_SHOWN);
     if (!window) {
         fprintf(stderr, "SDL_CreateWindow Error: %s\n", SDL_GetError());
@@ -123,6 +129,9 @@ void init(){
         SDL_Quit();
         exit(1);
     }
+    
+    
+
 }
 
 void gameinit(){
@@ -298,11 +307,6 @@ void rendermainmenu(){
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer,mainmenu,NULL,NULL);
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    SDL_RenderDrawRect(renderer, &startbox);
-    SDL_RenderDrawRect(renderer, &optionsbox);
-    SDL_RenderDrawRect(renderer, &infobox);
-    SDL_RenderDrawRect(renderer, &exitbox);
     SDL_RenderPresent(renderer);
 }
 
@@ -333,11 +337,6 @@ void renderoptions(){
 
     SDL_RenderCopy(renderer,options,NULL,NULL);
     SDL_RenderCopy(renderer,fallspeedtexture,NULL,&speedtextbox);
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    SDL_RenderDrawRect(renderer, &mapclearbox);
-    SDL_RenderDrawRect(renderer, &maptbox);
-    SDL_RenderDrawRect(renderer, &mapcbox);
-    SDL_RenderDrawRect(renderer, &mapuprbox);
 
     
     SDL_RenderPresent(renderer);
