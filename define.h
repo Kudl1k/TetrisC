@@ -33,7 +33,8 @@ SDL_Rect LightGrey = {384,0,BOARD_S,BOARD_S};
 SDL_Color White = {255,255,255,255};
 char scoretext[10000];
 char linetext[1000];
-int gamestate = 1; //* 0 = main menu, 1 = game, 2 = end screen, 3 = options, 4 = about
+char fallspeedtext[100];
+int gamestate = 0; //* 0 = main menu, 1 = game, 2 = end screen, 3 = options, 4 = about
 
 
 //* Definice Tetrinů
