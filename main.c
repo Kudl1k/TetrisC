@@ -29,8 +29,8 @@ SDL_Surface *fallspeedsurface;
 
 
 SDL_Rect wall = {0,0,880,960};
-SDL_Rect scorerect = {691,193,128,40};
-SDL_Rect linesrect = {691,261,128,40};
+SDL_Rect scorerect = {727,265,94,38};
+SDL_Rect linesrect = {751,336,46,38};
 
 
 int curnumber = 0;
@@ -122,8 +122,8 @@ void init(){
 }
 
 void gameinit(){
-    blocktexture = IMG_LoadTexture(renderer,"./src/blocks.png");
-    imgtexture = IMG_LoadTexture(renderer,"./src/gameimg.png");
+    blocktexture = IMG_LoadTexture(renderer,"./src/tetromino.png");
+    imgtexture = IMG_LoadTexture(renderer,"./src/gamegraphics.png");
     mainmenu = IMG_LoadTexture(renderer,"./src/mainmenu.png");
     options = IMG_LoadTexture(renderer,"./src/options.png");
     info = IMG_LoadTexture(renderer,"./src/info.png");
@@ -539,8 +539,8 @@ void grid_reset(Gameboard *board){
 
 void drawnextblock(Tetrino *block,SDL_Renderer *renderer,SDL_Texture *blocktexture){
     SDL_Rect next;
-    next.x = 600;
-    next.y = 480;
+    next.x = 525;
+    next.y = 676;
     next.h = next.w = 48;
     for (int i = 0; i < 4; i++)
     {
@@ -551,7 +551,7 @@ void drawnextblock(Tetrino *block,SDL_Renderer *renderer,SDL_Texture *blocktextu
             }
             next.x += next.w;
         }
-        next.x = 600;
+        next.x = 525;
         next.y += next.w;
     }
 }
