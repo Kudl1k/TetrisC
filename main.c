@@ -480,11 +480,11 @@ bool colision(Tetrino *block,Gameboard *map,int side){
     {
         for (int j = 0; j < 4; j++)
         {
-            if (((block->shape[i][j] == 1 && map->grid[blk.y][blk.x + 1] == 3) || (block->shape[i][j] == 1 && map->grid[blk.y][blk.x + 1] == 2))  && side == 1)
+            if (((block->shape[i][j] == 1 && map->grid[blk.y][blk.x + 1] == 3) || (block->shape[i][j] == 1 && map->grid[blk.y][blk.x + 1] == 2) || (block->shape[i][j] == 1 && map->grid[blk.y][blk.x + 1] == 6) )  && side == 1)
             {
                 return true;
             }
-            if (((block->shape[i][j] == 1 && map->grid[blk.y][blk.x - 1] == 3) || (block->shape[i][j] == 1 && map->grid[blk.y][blk.x - 1] == 2))&& side == 2)
+            if (((block->shape[i][j] == 1 && map->grid[blk.y][blk.x - 1] == 3) || (block->shape[i][j] == 1 && map->grid[blk.y][blk.x - 1] == 2) || (block->shape[i][j] == 1 && map->grid[blk.y][blk.x - 1] == 6))&& side == 2)
             {
                 return true;
             }
