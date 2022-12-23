@@ -175,9 +175,18 @@ void input(){
                         break;
                     case SDLK_LEFT:
                         if(!colision(&cur, &curmap,2)) cur.x -= 1;
+                        if (issettled(&cur,&curmap))
+                        {
+                            secondsElapsed = 0;
+                        }
+                        
                         break;
                     case SDLK_RIGHT:
                         if(!colision(&cur, &curmap,1)) cur.x += 1;
+                        if (issettled(&cur,&curmap))
+                        {
+                            secondsElapsed = 0;
+                        }
                         break;
                     case SDLK_ESCAPE:
                         gamestate = 0;
@@ -258,7 +267,7 @@ void input(){
 void game(){
         grid_reset(&curmap);
 
-        if (secondsElapsed >fallspeed)
+        if (secondsElapsed >fallspeed && (!issettled(&cur,&curmap)))
         {
             
             cur.y += 1;       //! posunovac
@@ -273,13 +282,15 @@ void game(){
                 gamestate = 2;
                 grid_reset(&curmap);
             }
-            addseatledblock(&cur,&curmap,secondsElapsed);
-            fullline(&curmap,&score,&linecounter);
-            cur = nextblock;
-            srand(time(0));
-            nextnumber = rand() % 7;
-            nextblock = block[nextnumber];
-            sprintf(scoretext,"%d",score);
+            if(secondsElapsed > fallspeed){
+                addseatledblock(&cur,&curmap,secondsElapsed);
+                fullline(&curmap,&score,&linecounter);
+                cur = nextblock;
+                srand(time(0));
+                nextnumber = rand() % 7;
+                nextblock = block[nextnumber];
+                sprintf(scoretext,"%d",score);
+            }
         }
 }
 
@@ -377,6 +388,7 @@ void tetris(){
 
         if (gamestate == 2)
         {
+            curmap = board[0];
             renderlosescreen();
         }
         
@@ -406,7 +418,7 @@ void tetris(){
 
 //! movement.h
 void rotate_block(Tetrino *block){
-    int N = 4;
+    int N = block->size;
     for (int i = 0; i < N / 2; i++) {
         for (int j = i; j < N - i - 1; j++) {
             int temp = block->shape[i][j];
@@ -514,24 +526,36 @@ void grid_init(Tetrino *block,Gameboard *map){
 void fullline(Gameboard *map,int *score,int *linecounter){
     int flag = 0;
     int j;
-    for (int i = 19; i > 0; i--)
+    bool found = true;
+    while (found)
     {
-        for (j = 1; j <= BOARD_W; j++){
-            if (map->grid[i][j] != 2 || map->grid[i][j] != 6)
-            {
-                flag = 0;
-                break;
+        for (int i = 19; i > 0; i--)
+        {
+            for (j = 1; j <= BOARD_W; j++){
+                if (map->grid[i][j] == 2 || map->grid[i][j] == 6)
+                {
+                    flag = 1;
+                    found = true;
+                }
+                else{
+                    flag = 0;
+                    found = false;
+                    break;
+                }
             }
-            flag = 1;
-        }
-        if (flag == 1) {
-            printf("true");
-            (*score) += 100;
-            (*linecounter) += 1;
-            clearline(map,i);
-            movedowngrid(map,i);
+            printf("\n");
+            if (flag == 1) {
+                found = true;
+                printf("true");
+                (*score) += 100;
+                (*linecounter) += 1;
+                clearline(map,i);
+                movedowngrid(map,i);
+            }
         }
     }
+    
+    
 }
 
 void clearline(Gameboard *map,int line){
