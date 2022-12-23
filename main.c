@@ -28,6 +28,7 @@ SDL_Texture *imgtexture;
 SDL_Texture *blocktexture;
 SDL_Texture *mainmenu;
 SDL_Texture *losescreen;
+SDL_Texture *winscreen;
 SDL_Texture *options;
 SDL_Texture *info;
 SDL_Texture *fallspeedtexture;
@@ -64,12 +65,14 @@ void destroy();
 void tetris();
 void rendermainmenu();
 void renderlosescreen();
+void renderwinscreen();
 void renderinfo();
 void renderoptions();
 
 //! movement.h
 void rotate_block(Tetrino *block);
 bool colision(Tetrino *block,Gameboard *map,int side);
+void harddrop(Tetrino *block, Gameboard *map);
 bool issettled(Tetrino *block, Gameboard *map);
 void addseatledblock(Tetrino *block, Gameboard *map,float fallspeed);
 //! drawing.h
@@ -141,6 +144,7 @@ void gameinit(){
     options = IMG_LoadTexture(renderer,"./src/MENUS/optionsmenu.png");
     info = IMG_LoadTexture(renderer,"./src/MENUS/infomenu.png");
     losescreen = IMG_LoadTexture(renderer,"./src/MENUS/losemenu.png");
+    winscreen = IMG_LoadTexture(renderer,"./src/MENUS/winmenu.png");
     curmap = board[0];
     srand(time(0));
     curnumber = rand() % 7;
@@ -188,8 +192,12 @@ void input(){
                             secondsElapsed = 0;
                         }
                         break;
+                    case SDLK_SPACE:
+                        harddrop(&cur,&curmap);
+                        break;
                     case SDLK_ESCAPE:
                         gamestate = 0;
+                        break;
                     }
                 }
             }
@@ -213,14 +221,13 @@ void input(){
                         }
                         if (SDL_PointInRect(&mousepos,&exitbox))
                         {
-                            printf("proslo");
                             quit = true;
                         }
                     }
                     
                 }
             }
-            if (gamestate == 2 || gamestate == 3  || gamestate == 4)
+            if (gamestate == 2 || gamestate == 3  || gamestate == 4 || gamestate == 5)
             {
                 if (e.type == SDL_MOUSEBUTTONDOWN)
                 {
@@ -247,17 +254,13 @@ void input(){
                         }
                         if (SDL_PointInRect(&mousepos,&mapclearbox)){
                             mapnumber = 0;
-                            printf("%d\n",mapnumber);
 
                             }
                         if (SDL_PointInRect(&mousepos,&maptbox)){
-                            printf("%d\n",mapnumber);
                             mapnumber = 1;
                         }
                         if (SDL_PointInRect(&mousepos,&mapcbox)) mapnumber = 2;
                         if (SDL_PointInRect(&mousepos,&mapuprbox)) mapnumber = 3;
-                        printf("%d\n",mapnumber);
-                        printf("%f\n",fallspeed);
                     }
                 }     
             }
@@ -280,8 +283,11 @@ void game(){
         {
             if (gameover(&curmap)) {
                 gamestate = 2;
-                grid_reset(&curmap);
             }
+            if (gameover(&curmap)) {
+                gamestate = 5;
+            }
+
             if(secondsElapsed > fallspeed){
                 addseatledblock(&cur,&curmap,secondsElapsed);
                 fullline(&curmap,&score,&linecounter);
@@ -324,16 +330,28 @@ void rendermainmenu(){
 void renderlosescreen(){
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
-    scorerect.x = linesrect.x = 473;
-    scorerect.y = 522;
-    scorerect.w = linesrect.w = 120;
-    scorerect.h = linesrect.h = 40;
-    linesrect.y = 600;
+    scorerect.x = linesrect.x = 472;
+    scorerect.y = 461;
+    scorerect.w = linesrect.w = 116;
+    scorerect.h = linesrect.h = 50;
+    linesrect.y = 516;
     SDL_RenderCopy(renderer,losescreen,NULL,NULL);
     SDL_RenderCopy(renderer,scoretexture,NULL,&scorerect);
     SDL_RenderCopy(renderer,linetexture,NULL,&linesrect);
+    SDL_RenderPresent(renderer);
+}
 
-
+void renderwinscreen(){
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    scorerect.x = linesrect.x = 472;
+    scorerect.y = 461;
+    scorerect.w = linesrect.w = 116;
+    scorerect.h = linesrect.h = 50;
+    linesrect.y = 516;
+    SDL_RenderCopy(renderer,winscreen,NULL,NULL);
+    SDL_RenderCopy(renderer,scoretexture,NULL,&scorerect);
+    SDL_RenderCopy(renderer,linetexture,NULL,&linesrect);
     SDL_RenderPresent(renderer);
 }
 
@@ -402,6 +420,10 @@ void tetris(){
         {
             renderinfo();
         }
+        if (gamestate == 5)
+        {
+            renderwinscreen();
+        }
         
         
         if(gamestate == 1){
@@ -458,6 +480,13 @@ bool colision(Tetrino *block,Gameboard *map,int side){
     return false;
 }
 
+void harddrop(Tetrino *block, Gameboard *map){
+    while (!issettled(block,map))
+    {
+        block->y++;
+    }
+    
+}
 
 bool issettled(Tetrino *block, Gameboard *map){
     SDL_Rect blk;
@@ -524,36 +553,28 @@ void grid_init(Tetrino *block,Gameboard *map){
 }
 
 void fullline(Gameboard *map,int *score,int *linecounter){
-    int flag = 0;
-    int j;
-    bool found = true;
-    while (found)
-    {
+    int flag = 0;    
         for (int i = 19; i > 0; i--)
         {
-            for (j = 1; j <= BOARD_W; j++){
+            for (int j = 1; j <= BOARD_W; j++){
+                
                 if (map->grid[i][j] == 2 || map->grid[i][j] == 6)
                 {
                     flag = 1;
-                    found = true;
                 }
                 else{
                     flag = 0;
-                    found = false;
                     break;
                 }
             }
-            printf("\n");
             if (flag == 1) {
-                found = true;
-                printf("true");
-                (*score) += 100;
+                (*score) += 800;
                 (*linecounter) += 1;
                 clearline(map,i);
                 movedowngrid(map,i);
+                fullline(map,score,linecounter);
             }
         }
-    }
     
     
 }
@@ -641,5 +662,27 @@ bool gameover(Gameboard *map){
             return true;
         }
     }
+    return false;
+}
+
+bool gamewin(Gameboard *map){
+    if (mapnumber == 1 || mapnumber == 2 || mapnumber == 3)
+    {
+        for (int i = 0; i < BOARD_H; i++)
+        {
+            for (int j = 1; j <= BOARD_W; j++)
+            {
+                if (map->grid[i][j] == 6)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    
+    
+        
     return false;
 }
