@@ -97,6 +97,7 @@ void movedowngrid(Gameboard *map,int line);
 
 //! ...
 bool gameover(Gameboard *map);
+bool gamewin(Gameboard *map);
 
 
 
@@ -164,6 +165,7 @@ void gameinit(){
     yellow = IMG_LoadTexture(renderer,"./src/blocksimg/yellow.png");
 
 
+    
 
     curmap = board[0];
     srand(time(0));
@@ -229,6 +231,14 @@ void input(){
                     {
                         if (SDL_PointInRect(&mousepos,&startbox)) {
                             gamestate = 1;
+                            scorerect.x = 727;
+                            scorerect.y = 265;
+                            scorerect.w = 94;
+                            scorerect.h = 38;
+                            linesrect.x = 751;
+                            linesrect.y = 336;
+                            linesrect.w = 46;
+                            linesrect.h = 38;
                             grid_reset(&curmap);
                         }
                         if (SDL_PointInRect(&mousepos,&optionsbox))
@@ -304,7 +314,7 @@ void game(){
             if (gameover(&curmap)) {
                 gamestate = 2;
             }
-            if (gameover(&curmap)) {
+            if (gamewin(&curmap)) {
                 gamestate = 5;
             }
 
