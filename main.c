@@ -34,6 +34,15 @@ SDL_Texture *info;
 SDL_Texture *fallspeedtexture;
 SDL_Surface *fallspeedsurface;
 
+SDL_Texture *blue;
+SDL_Texture *cyan;
+SDL_Texture *green;
+SDL_Texture *orange;
+SDL_Texture *purple;
+SDL_Texture *red;
+SDL_Texture *yellow;
+
+
 
 SDL_Rect wall = {0,0,880,960};
 SDL_Rect scorerect = {727,265,94,38};
@@ -76,7 +85,7 @@ void harddrop(Tetrino *block, Gameboard *map);
 bool issettled(Tetrino *block, Gameboard *map);
 void addseatledblock(Tetrino *block, Gameboard *map,float fallspeed);
 //! drawing.h
-void drawnextblock(Tetrino *block,SDL_Renderer *renderer,SDL_Texture *blocktexture);
+void drawnextblock(int blknumber,SDL_Renderer *renderer);
 void drawtetrino(int x, int y,SDL_Texture *texture,SDL_Rect img,SDL_Renderer *renderer);
 void drawgrid(Gameboard *map,Tetrino *block,SDL_Renderer *renderer, SDL_Texture *blocktexture);
 //! grid.h
@@ -145,6 +154,17 @@ void gameinit(){
     info = IMG_LoadTexture(renderer,"./src/MENUS/infomenu.png");
     losescreen = IMG_LoadTexture(renderer,"./src/MENUS/losemenu.png");
     winscreen = IMG_LoadTexture(renderer,"./src/MENUS/winmenu.png");
+
+    blue = IMG_LoadTexture(renderer,"./src/blocksimg/blue.png");
+    cyan = IMG_LoadTexture(renderer,"./src/blocksimg/cyan.png");
+    green = IMG_LoadTexture(renderer,"./src/blocksimg/green.png");
+    orange = IMG_LoadTexture(renderer,"./src/blocksimg/orange.png");
+    purple = IMG_LoadTexture(renderer,"./src/blocksimg/purple.png");
+    red = IMG_LoadTexture(renderer,"./src/blocksimg/red.png");
+    yellow = IMG_LoadTexture(renderer,"./src/blocksimg/yellow.png");
+
+
+
     curmap = board[0];
     srand(time(0));
     curnumber = rand() % 7;
@@ -316,7 +336,7 @@ void rendergame(){
     SDL_RenderCopy(renderer,scoretexture,NULL,&scorerect);
     SDL_RenderCopy(renderer,linetexture,NULL,&linesrect);
     drawgrid(&curmap,&cur,renderer,blocktexture);
-    drawnextblock(&nextblock,renderer,blocktexture);
+    drawnextblock(nextnumber,renderer);
     SDL_RenderPresent(renderer);
 }
 
@@ -609,23 +629,18 @@ void grid_reset(Gameboard *map){
     }
 }
 
-void drawnextblock(Tetrino *block,SDL_Renderer *renderer,SDL_Texture *blocktexture){
+void drawnextblock(int blknumber,SDL_Renderer *renderer){
     SDL_Rect next;
-    next.x = 525;
-    next.y = 676;
-    next.h = next.w = 48;
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            if (block->shape[i][j]==1){
-                SDL_RenderCopy(renderer,blocktexture,&block->img,&next);
-            }
-            next.x += next.w;
-        }
-        next.x = 525;
-        next.y += next.w;
-    }
+    next.x = 589;
+    next.y = 577;
+    next.h = next.w = 192;
+    if (blknumber == 0) SDL_RenderCopy(renderer,cyan,NULL,&next);
+    if (blknumber == 1) SDL_RenderCopy(renderer,yellow,NULL,&next);
+    if (blknumber == 2) SDL_RenderCopy(renderer,purple,NULL,&next);
+    if (blknumber == 3) SDL_RenderCopy(renderer,blue,NULL,&next);
+    if (blknumber == 4) SDL_RenderCopy(renderer,orange,NULL,&next);
+    if (blknumber == 5) SDL_RenderCopy(renderer,green,NULL,&next);
+    if (blknumber == 6) SDL_RenderCopy(renderer,red,NULL,&next);
 }
 
 void drawtetrino(int x, int y,SDL_Texture *texture,SDL_Rect img,SDL_Renderer *renderer){
@@ -680,9 +695,6 @@ bool gamewin(Gameboard *map){
         }
         return true;
     }
-    
-    
-    
         
     return false;
 }
