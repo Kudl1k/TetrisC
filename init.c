@@ -392,7 +392,7 @@ void tetris(){
         {
             renderwinscreen(renderer,scorerect,linesrect,winscreentexture,scoretexture,linetexture);
         }
-        if(state == game){
+        if(state == GAME){
             Uint64 start = SDL_GetPerformanceCounter();
             game(secondsElapsed,fallspeed,mapnumber,state,score,linecounter,nextnumber,scoretext);
             rendergame(renderer,font,scoretexture,linetexture,imgtexture,blocktexture,nextblocktexture,scorerect,linesrect,scoretext,linetext,nextnumber,score,linecounter);
