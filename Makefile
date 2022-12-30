@@ -1,4 +1,4 @@
-C_FILES= main.c update.c drawing.c grid.c
+C_FILES= main.c update.c drawing.c grid.c init.c
 
 C_FLAGS= -g -fsanitize=address
 

@@ -11,13 +11,6 @@
 #include <time.h>
 
 
-
-#define RUNNING 1
-#define SEATLED 2
-
-
-//* Definice herního pole
-
 #define BOARD_W 10
 #define BOARD_H 20
 #define BOARD_S 48
@@ -27,12 +20,5 @@
 
 #define START_X 5
 #define START_Y 0
-
-//* Definice barev
-
-
-
-//* Definice Tetrinů
-
 
 #endif
