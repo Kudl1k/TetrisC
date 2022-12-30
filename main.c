@@ -1,10 +1,21 @@
 #include "define.h"
+#include "tetromino.h"
+#include "gameboard.h"
+#include "update.h"
+#include "drawing.h"
 
 
 //! game
 SDL_Window* window;
 SDL_Renderer* renderer;
 TTF_Font* font;
+
+
+SDL_Color White = {255,255,255,255};
+char scoretext[10000];
+char linetext[1000];
+char fallspeedtext[100];
+int gamestate = 0; //* 0 = main menu, 1 = game, 2 = end screen, 3 = options, 4 = about , 5 = winscreen
 
 
 bool quit = false;
@@ -34,13 +45,7 @@ SDL_Texture *info;
 SDL_Texture *fallspeedtexture;
 SDL_Surface *fallspeedsurface;
 
-SDL_Texture *blue;
-SDL_Texture *cyan;
-SDL_Texture *green;
-SDL_Texture *orange;
-SDL_Texture *purple;
-SDL_Texture *red;
-SDL_Texture *yellow;
+SDL_Texture *nextblocktexture;
 
 
 
@@ -78,16 +83,9 @@ void renderwinscreen();
 void renderinfo();
 void renderoptions();
 
-//! movement.h
-void rotate_block(Tetrino *block);
-bool colision(Tetrino *block,Gameboard *map,int side);
-void harddrop(Tetrino *block, Gameboard *map);
-bool issettled(Tetrino *block, Gameboard *map);
-void addseatledblock(Tetrino *block, Gameboard *map,float fallspeed);
+
 //! drawing.h
-void drawnextblock(int blknumber,SDL_Renderer *renderer);
-void drawtetrino(int x, int y,SDL_Texture *texture,SDL_Rect img,SDL_Renderer *renderer);
-void drawgrid(Gameboard *map,Tetrino *block,SDL_Renderer *renderer, SDL_Texture *blocktexture);
+
 //! grid.h
 void grid_init(Tetrino *block,Gameboard *map);
 void grid_reset(Gameboard *map);
@@ -156,16 +154,7 @@ void gameinit(){
     losescreen = IMG_LoadTexture(renderer,"./src/MENUS/losemenu.png");
     winscreen = IMG_LoadTexture(renderer,"./src/MENUS/winmenu.png");
 
-    blue = IMG_LoadTexture(renderer,"./src/blocksimg/blue.png");
-    cyan = IMG_LoadTexture(renderer,"./src/blocksimg/cyan.png");
-    green = IMG_LoadTexture(renderer,"./src/blocksimg/green.png");
-    orange = IMG_LoadTexture(renderer,"./src/blocksimg/orange.png");
-    purple = IMG_LoadTexture(renderer,"./src/blocksimg/purple.png");
-    red = IMG_LoadTexture(renderer,"./src/blocksimg/red.png");
-    yellow = IMG_LoadTexture(renderer,"./src/blocksimg/yellow.png");
-
-
-    
+    nextblocktexture = IMG_LoadTexture(renderer,"./src/tetrominonextblock.png");
 
     curmap = board[0];
     srand(time(0));
@@ -346,7 +335,7 @@ void rendergame(){
     SDL_RenderCopy(renderer,scoretexture,NULL,&scorerect);
     SDL_RenderCopy(renderer,linetexture,NULL,&linesrect);
     drawgrid(&curmap,&cur,renderer,blocktexture);
-    drawnextblock(nextnumber,renderer);
+    drawnextblock(nextnumber,renderer,nextblocktexture);
     SDL_RenderPresent(renderer);
 }
 
@@ -410,6 +399,7 @@ void renderinfo(){
 
 void destroy(){
     TTF_CloseFont(font);
+    SDL_DestroyTexture(nextblocktexture);
     SDL_DestroyTexture(blocktexture);
     SDL_DestroyTexture(imgtexture);
     SDL_DestroyTexture(scoretexture);
@@ -469,97 +459,6 @@ void tetris(){
 }
 
 //! movement.h
-void rotate_block(Tetrino *block){
-    int N = block->size;
-    for (int i = 0; i < N / 2; i++) {
-        for (int j = i; j < N - i - 1; j++) {
-            int temp = block->shape[i][j];
-            block->shape[i][j] = block->shape[N - 1 - j][i];
-            block->shape[N - 1 - j][i] = block->shape[N - 1 - i][N - 1 - j];
-            block->shape[N - 1 - i][N - 1 - j] = block->shape[j][N - 1 - i];
-            block->shape[j][N - 1 - i] = temp;
-        }
-    }
-}
-
-bool colision(Tetrino *block,Gameboard *map,int side){
-    SDL_Rect blk;
-    blk.x = block->x;
-    blk.y = block->y;
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            if (((block->shape[i][j] == 1 && map->grid[blk.y][blk.x + 1] == 3) || (block->shape[i][j] == 1 && map->grid[blk.y][blk.x + 1] == 2) || (block->shape[i][j] == 1 && map->grid[blk.y][blk.x + 1] == 6) )  && side == 1)
-            {
-                return true;
-            }
-            if (((block->shape[i][j] == 1 && map->grid[blk.y][blk.x - 1] == 3) || (block->shape[i][j] == 1 && map->grid[blk.y][blk.x - 1] == 2) || (block->shape[i][j] == 1 && map->grid[blk.y][blk.x - 1] == 6))&& side == 2)
-            {
-                return true;
-            }
-            if ((map->grid[blk.y][blk.x - 1] == 3 || map->grid[blk.y][blk.x + 1] == 3) && side == 3)
-            {
-                return true;
-            }
-            blk.x++;
-        }
-        blk.x = block->x;
-        blk.y++;
-    }
-    return false;
-}
-
-void harddrop(Tetrino *block, Gameboard *map){
-    while (!issettled(block,map))
-    {
-        block->y++;
-    }
-    
-}
-
-bool issettled(Tetrino *block, Gameboard *map){
-    SDL_Rect blk;
-    blk.x = block->x;
-    blk.y = block->y;
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            if ((block->shape[i][j] == 1 && map->grid[blk.y + 1][blk.x] == 4) || (block->shape[i][j] == 1 && map->grid[blk.y + 1][blk.x] == 2) ||(block->shape[i][j] == 1 && map->grid[blk.y + 1][blk.x] == 6))
-            {
-                return true;
-            } 
-            blk.x++;
-        }
-        blk.x = block->x;
-        blk.y++;
-    }
-    return false;
-}
-
-void addseatledblock(Tetrino *block, Gameboard *map,float fallspeed){
-    SDL_Rect blk;
-    blk.x = block->x;
-    blk.y = block->y;
-    
-    
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            if (block->shape[i][j] == 1)
-            {
-                map->grid[blk.y][blk.x] = 2;
-            } 
-            blk.x++;
-        }
-        blk.x = block->x;
-        blk.y++;
-    }
-
-
-}
 
 
 //! grid.h
@@ -639,41 +538,7 @@ void grid_reset(Gameboard *map){
     }
 }
 
-void drawnextblock(int blknumber,SDL_Renderer *renderer){
-    SDL_Rect next;
-    next.x = 589;
-    next.y = 577;
-    next.h = next.w = 192;
-    if (blknumber == 0) SDL_RenderCopy(renderer,cyan,NULL,&next);
-    if (blknumber == 1) SDL_RenderCopy(renderer,yellow,NULL,&next);
-    if (blknumber == 2) SDL_RenderCopy(renderer,purple,NULL,&next);
-    if (blknumber == 3) SDL_RenderCopy(renderer,blue,NULL,&next);
-    if (blknumber == 4) SDL_RenderCopy(renderer,orange,NULL,&next);
-    if (blknumber == 5) SDL_RenderCopy(renderer,green,NULL,&next);
-    if (blknumber == 6) SDL_RenderCopy(renderer,red,NULL,&next);
-}
 
-void drawtetrino(int x, int y,SDL_Texture *texture,SDL_Rect img,SDL_Renderer *renderer){
-    SDL_Rect rect = {x-1,y,BOARD_S,BOARD_S};
-    SDL_RenderCopy(renderer,texture,&img,&rect);
-}
-
-void drawgrid(Gameboard *map,Tetrino *block,SDL_Renderer *renderer,SDL_Texture *blocktexture){
-    SDL_Rect grid = {0,0,0,0};
-    for (int i = 0; i < BOARD_H; i++)
-    {
-        for (int j = 1; j <= BOARD_W; j++)
-        {
-            if (map->grid[i][j] == 0) drawtetrino(grid.x,grid.y,blocktexture,Grey,renderer);
-            if (map->grid[i][j] == 1) drawtetrino(grid.x,grid.y,blocktexture,block->img,renderer);
-            if (map->grid[i][j] == 2) drawtetrino(grid.x,grid.y,blocktexture,LightGrey,renderer);
-            if (map->grid[i][j] == 6) drawtetrino(grid.x,grid.y,blocktexture,Pink,renderer);
-            grid.x += BOARD_S;
-        }
-        grid.x = 0;
-        grid.y += BOARD_S;
-    }    
-}
 
 //! ...
 

@@ -1,11 +1,14 @@
 {
     "files.associations": {
+        "*.hs": "haskell",
         "help.h": "c",
         "sdl_image.h": "c",
         "init.h": "c",
         "define.h": "c",
         "sdl.h": "c",
         "time.h": "c",
-        "sdl_ttf.h": "c"
+        "sdl_ttf.h": "c",
+        "tetromino.h": "c",
+        "gameboard.h": "c"
     }
 }
