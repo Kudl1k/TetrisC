@@ -9,6 +9,7 @@
         "time.h": "c",
         "sdl_ttf.h": "c",
         "tetromino.h": "c",
-        "gameboard.h": "c"
+        "gameboard.h": "c",
+        "stdbool.h": "c"
     }
 }

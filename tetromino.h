@@ -2,7 +2,6 @@
 
 #include "define.h"
 
-
 typedef struct
 {
     int x;
