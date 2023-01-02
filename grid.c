@@ -75,33 +75,3 @@ void grid_reset(Gameboard *map){
     }
 }
 
-bool gameover(Gameboard *map){
-    for (int j = 1; j <= BOARD_W; j++)
-    {
-        if (map->grid[3][j] == 2)
-        {
-            curmap = board[0];
-            return true;
-        }
-    }
-    return false;
-}
-
-bool gamewin(Gameboard *map,int mapnumber){
-    if (mapnumber == 1 || mapnumber == 2 || mapnumber == 3)
-    {
-        for (int i = 0; i < BOARD_H; i++)
-        {
-            for (int j = 1; j <= BOARD_W; j++)
-            {
-                if (map->grid[i][j] == 6)
-                {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-        
-    return false;
-}
