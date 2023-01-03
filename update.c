@@ -69,7 +69,7 @@ bool issettled(Tetromino *block, Gameboard *map){
     return false;
 }
 
-void addseatledblock(Tetromino *block, Gameboard *map,float fallspeed){
+void addseatledblock(Tetromino *block, Gameboard *map){
     SDL_Rect blk;
     blk.x = block->x;
     blk.y = block->y;

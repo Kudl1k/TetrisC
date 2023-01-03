@@ -257,7 +257,7 @@ int main()
                 }
 
                 if(secondsElapsed > fallspeed){
-                    addseatledblock(&cur,&curmap,secondsElapsed);
+                    addseatledblock(&cur,&curmap);
                     fullline(&curmap,&score,&linecounter);
                     cur = nextblock;
                     srand(time(0));
