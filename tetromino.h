@@ -9,5 +9,5 @@ typedef struct
     int size;
     int shape[4][4];
     SDL_Rect img;
-}Tetrino;
+}Tetromino;
 

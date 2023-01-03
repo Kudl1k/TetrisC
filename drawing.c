@@ -39,6 +39,7 @@ void drawnextblock(int blknumber,SDL_Renderer *renderer,SDL_Texture *nextblocks)
         block.x = 1080;
         SDL_RenderCopy(renderer,nextblocks,&block,&next);
         }
+    
 }
 
 void drawtetrino(int x, int y,SDL_Texture *texture,SDL_Rect img,SDL_Renderer *renderer){
@@ -46,7 +47,7 @@ void drawtetrino(int x, int y,SDL_Texture *texture,SDL_Rect img,SDL_Renderer *re
     SDL_RenderCopy(renderer,texture,&img,&rect);
 }
 
-void drawgrid(Gameboard *map,Tetrino *block,SDL_Renderer *renderer,SDL_Texture *blocktexture){
+void drawgrid(Gameboard *map,Tetromino *block,SDL_Renderer *renderer,SDL_Texture *blocktexture){
     SDL_Rect Grey = {336,0,BOARD_S,BOARD_S};
     SDL_Rect LightGrey = {384,0,BOARD_S,BOARD_S};
     SDL_Rect Pink = {432,0,BOARD_S,BOARD_S};

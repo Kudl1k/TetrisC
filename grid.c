@@ -1,7 +1,7 @@
 #include "grid.h"
 
 
-void grid_init(Tetrino *block,Gameboard *map){    
+void grid_init(Tetromino *block,Gameboard *map){    
     SDL_Rect blk;
     blk.x = block->x;
     blk.y = block->y;

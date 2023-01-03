@@ -3,6 +3,7 @@
 
 int main()
 {
+    // Incializace SDLka
     if (SDL_Init(SDL_INIT_VIDEO)) {
         fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
         exit(1);
@@ -34,20 +35,21 @@ int main()
     SDL_Texture *linetexture;
     SDL_Texture *fallspeedtexture;
 
+    // nastaveni zakladnich promenych
     int curnumber,nextnumber,mapnumber;
     gamestate state = MAINMENU;
     bool quit = false;
     float secondsElapsed = 0,fallspeed = 0.5;
     int score = 0;
     int linecounter = 0;
-
     SDL_Rect scorerect = {727,265,94,38};
     SDL_Rect linesrect = {751,336,46,38};
-
     char scoretext[10000];
     char linetext[1000];
     char fallspeedtext[100];
 
+
+    // Loadnuti textur
     SDL_Texture *blocktexture = IMG_LoadTexture(renderer,"./src/tetromino.png");
     SDL_Texture *imgtexture = IMG_LoadTexture(renderer,"./src/MENUS/gamemenu.png");
     SDL_Texture *mainmenutexture = IMG_LoadTexture(renderer,"./src/MENUS/mainmenu.png");
@@ -57,7 +59,23 @@ int main()
     SDL_Texture *winscreentexture = IMG_LoadTexture(renderer,"./src/MENUS/winmenu.png");
     SDL_Texture *nextblocktexture = IMG_LoadTexture(renderer,"./src/tetrominonextblock.png");
 
+    
 
+    // Tlacitka v menu
+    SDL_Rect startbox = {271,410,338,78};
+    SDL_Rect optionsbox = {271,503,338,78};
+    SDL_Rect infobox = {271,591,338,78};
+    SDL_Rect exitbox = {271,680,338,78};
+    SDL_Rect backbox = {271,680,338,78};
+    SDL_Rect plusspeedbox = {623,318,36,36};
+    SDL_Rect minspeedbox = {526,318,36,36};
+    SDL_Rect mapclearbox = {228,456,80,160};
+    SDL_Rect maptbox = {342,456,80,160};
+    SDL_Rect mapcbox = {457,456,80,160};
+    SDL_Rect mapuprbox = {571,456,80,160};
+
+
+    //Nastaveni hry
     state = MAINMENU;
     curmap = board[0];
     srand(time(0));
@@ -68,17 +86,7 @@ int main()
     
     while (!quit)
     {
-    const SDL_Rect startbox = {271,410,338,78};
-    const SDL_Rect optionsbox = {271,503,338,78};
-    const SDL_Rect infobox = {271,591,338,78};
-    const SDL_Rect exitbox = {271,680,338,78};
-    const SDL_Rect backbox = {271,680,338,78};
-    const SDL_Rect plusspeedbox = {623,318,36,36};
-    const SDL_Rect minspeedbox = {526,318,36,36};
-    const SDL_Rect mapclearbox = {228,456,80,160};
-    const SDL_Rect maptbox = {342,456,80,160};
-    const SDL_Rect mapcbox = {457,456,80,160};
-    const SDL_Rect mapuprbox = {571,456,80,160};
+    
 
 
     SDL_Event e;
@@ -93,7 +101,7 @@ int main()
             {
                 SDL_GetMouseState(&mousepos.x,&mousepos.y);
             } 
-            if (state == GAME)
+            if (state == GAME) //inpur pro hru
             {
                 if (e.type == SDL_KEYDOWN)
                 {
@@ -131,7 +139,7 @@ int main()
                     }
                 }
             }
-            if (state == MAINMENU)
+            if (state == MAINMENU) //input pro mainmenu
             {
                 if (e.type == SDL_MOUSEBUTTONDOWN)
                 {
@@ -165,7 +173,7 @@ int main()
                     
                 }
             }
-            if (state == OPTIONS || state == ABOUT || state == WIN || state == LOSE)
+            if (state == OPTIONS || state == ABOUT || state == WIN || state == LOSE) // input pro backbutton pro menu
             {
                 if (e.type == SDL_MOUSEBUTTONDOWN)
                 {
@@ -177,7 +185,7 @@ int main()
                     }
                 }     
             }
-            if (state == OPTIONS)
+            if (state == OPTIONS) // input pro options
             {
                 if (e.type == SDL_MOUSEBUTTONDOWN)
                 {
@@ -203,45 +211,38 @@ int main()
                 }     
             }
         }
-        printf("%d\n",state);
-        if (state == MAINMENU){
+        if (state == MAINMENU){ // renderovani mainmenu
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             SDL_RenderClear(renderer);
             SDL_RenderCopy(renderer,mainmenutexture,NULL,NULL);
             SDL_RenderPresent(renderer);
-            printf("mainmenu");
         }
-        if (state == LOSE)
+        if (state == LOSE) // renderovani losescreenu
         {
             curmap = board[0];
             renderlosescreen(renderer,scorerect,linesrect,losescreentexture,scoretexture,linetexture);
-            printf("lose");
         }
-        if (state == OPTIONS)
+        if (state == OPTIONS) // renderovani options
         {
             renderoptions(renderer,font,fallspeedtext,fallspeedtexture,optionstexture,fallspeed);
             curmap = board[mapnumber];
-            printf("options");
 
         }
-        if (state == ABOUT)
+        if (state == ABOUT) // renderovani infa
         {
             renderinfo(renderer, infotexture);
-            printf("info");
         }
-        if (state == WIN)
+        if (state == WIN) // renderovani winscreenu
         {
-            printf("win");
             renderwinscreen(renderer,scorerect,linesrect,winscreentexture,scoretexture,linetexture);
         }
-        if(state == GAME){
-            printf("game");
+        if(state == GAME){ // renderovani hry
             Uint64 start = SDL_GetPerformanceCounter();
             grid_reset(&curmap);
             if (secondsElapsed >fallspeed && (!issettled(&cur,&curmap)))
             {
                 
-                cur.y += 1;       //! posunovac
+                cur.y += 1;       // posunovac
                 secondsElapsed = 0;
             }
             
@@ -267,7 +268,7 @@ int main()
                 }
             }
 
-            
+            //zapsani score
             SDL_Color White = {255,255,255,255};
             SDL_Surface *scoresurface = TTF_RenderText_Solid(font,  scoretext, White);
             scoretexture = SDL_CreateTextureFromSurface(renderer, scoresurface);
@@ -277,6 +278,8 @@ int main()
             linetexture = SDL_CreateTextureFromSurface(renderer, linesurface);
             SDL_FreeSurface(linesurface);
             sprintf(linetext,"%d",linecounter);
+
+            //vyrendrovani hry
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             SDL_RenderClear(renderer);
             SDL_RenderCopy(renderer,imgtexture,NULL,NULL);

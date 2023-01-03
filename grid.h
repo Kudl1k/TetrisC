@@ -4,7 +4,7 @@
 #include "tetromino.h"
 #include "gameboard.h"
 
-void grid_init(Tetrino *block,Gameboard *map);
+void grid_init(Tetromino *block,Gameboard *map);
 void grid_reset(Gameboard *map);
 void fullline(Gameboard *map,int *score,int *linecounter);
 void clearline(Gameboard *map,int line);

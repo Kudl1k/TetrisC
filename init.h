@@ -26,7 +26,7 @@ typedef enum{
 
 
 
-static Tetrino block[7] ={{
+static Tetromino block[7] ={{
     START_X,START_Y,4,
     0,0,0,0,
     1,1,1,1,            //! Tvar I
@@ -164,14 +164,6 @@ static Gameboard board[4] = {{
 
 
 
-
-void gameinit(SDL_Renderer *renderer,SDL_Texture *blocktexture,SDL_Texture *imgtexture, SDL_Texture *mainmenutexture,SDL_Texture *optionstexture,SDL_Texture *infotexture, SDL_Texture *losescreentexture, SDL_Texture *winscreentexture,SDL_Texture *nextblocktexture,int curnumber, int nextnumber,gamestate stateofgame);
-
-void input(bool quit,gamestate stateofgame,float secondsElapsed,SDL_Rect scorerect,SDL_Rect linesrect,int mapnumber, float fallspeed);
-
-void game(float secondsElapsed,float fallspeed,int mapnumber,gamestate stateofgame,int score, int linecounter,int nextnumber,char *scoretext);
-
-void rendergame(SDL_Renderer *renderer,TTF_Font *font,SDL_Texture *scoretexture,SDL_Texture *linetexture,SDL_Texture *imgtexture,SDL_Texture *blocktexture,SDL_Texture *nextblocktexture,SDL_Rect scorerect, SDL_Rect linesrect,char *scoretext,char *linetext,int nextnumber,int score,int linecounter);
 
 void rendermainmenu(SDL_Renderer *renderer,SDL_Texture *mainmenutexture);
 

@@ -1,6 +1,6 @@
 #include "update.h"
 
-void rotate_block(Tetrino *block){
+void rotate_block(Tetromino *block){
     int N = block->size;
     for (int i = 0; i < N / 2; i++) {
         for (int j = i; j < N - i - 1; j++) {
@@ -13,7 +13,7 @@ void rotate_block(Tetrino *block){
     }
 }
 
-bool colision(Tetrino *block,Gameboard *map,int side){
+bool colision(Tetromino *block,Gameboard *map,int side){
     SDL_Rect blk;
     blk.x = block->x;
     blk.y = block->y;
@@ -41,7 +41,7 @@ bool colision(Tetrino *block,Gameboard *map,int side){
     return false;
 }
 
-void harddrop(Tetrino *block, Gameboard *map){
+void harddrop(Tetromino *block, Gameboard *map){
     while (!issettled(block,map))
     {
         block->y++;
@@ -49,7 +49,7 @@ void harddrop(Tetrino *block, Gameboard *map){
     
 }
 
-bool issettled(Tetrino *block, Gameboard *map){
+bool issettled(Tetromino *block, Gameboard *map){
     SDL_Rect blk;
     blk.x = block->x;
     blk.y = block->y;
@@ -69,7 +69,7 @@ bool issettled(Tetrino *block, Gameboard *map){
     return false;
 }
 
-void addseatledblock(Tetrino *block, Gameboard *map,float fallspeed){
+void addseatledblock(Tetromino *block, Gameboard *map,float fallspeed){
     SDL_Rect blk;
     blk.x = block->x;
     blk.y = block->y;
