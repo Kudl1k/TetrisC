@@ -10,6 +10,8 @@
         "sdl_ttf.h": "c",
         "tetromino.h": "c",
         "gameboard.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "grid.h": "c",
+        "drawing.h": "c"
     }
 }

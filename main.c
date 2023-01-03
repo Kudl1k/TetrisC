@@ -44,6 +44,8 @@ int main()
     int linecounter = 0;
     SDL_Rect scorerect = {727,265,94,38};
     SDL_Rect linesrect = {751,336,46,38};
+    SDL_Rect nextblockloc = {589,577,192,192};
+    SDL_Rect nextblockpiece = {0,0,192,192};
     char scoretext[10000];
     char linetext[1000];
     char fallspeedtext[100];
@@ -83,15 +85,12 @@ int main()
     cur = block[curnumber];
     nextnumber = rand() % 7;
     nextblock = block[nextnumber];
-    
-    while (!quit)
-    {
-    
-
-
     SDL_Event e;
     SDL_Point mousepos;
-    while (SDL_PollEvent(&e))
+
+    while (!quit)
+    {
+        while (SDL_PollEvent(&e))
         {
             if (e.type == SDL_QUIT)
             {
@@ -99,9 +98,9 @@ int main()
             }
             if (e.type == SDL_MOUSEMOTION)
             {
-                SDL_GetMouseState(&mousepos.x,&mousepos.y);
+                SDL_GetMouseState(&mousepos.x,&mousepos.y); //pozice mysi
             } 
-            if (state == GAME) //inpur pro hru
+            if (state == GAME) //input pro hru
             {
                 if (e.type == SDL_KEYDOWN)
                 {
@@ -152,7 +151,7 @@ int main()
                             scorerect.w = 94;
                             scorerect.h = 38;
                             linesrect.x = 751;
-                            linesrect.y = 336;
+                            linesrect.y = 320;
                             linesrect.w = 46;
                             linesrect.h = 38;
                             grid_reset(&curmap);
@@ -286,7 +285,9 @@ int main()
             SDL_RenderCopy(renderer,scoretexture,NULL,&scorerect);
             SDL_RenderCopy(renderer,linetexture,NULL,&linesrect);
             drawgrid(&curmap,&cur,renderer,blocktexture);
-            drawnextblock(nextnumber,renderer,nextblocktexture);
+            printf("%d\n",nextnumber);
+            nextblockpiece.x = drawnextblock(nextnumber);
+            SDL_RenderCopy(renderer,nextblocktexture,&nextblockpiece,&nextblockloc);
             SDL_RenderPresent(renderer);
             Uint64 end = SDL_GetPerformanceCounter();
             secondsElapsed = secondsElapsed + ( (end - start) / (float)SDL_GetPerformanceFrequency());

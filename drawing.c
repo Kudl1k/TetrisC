@@ -1,43 +1,27 @@
 #include "drawing.h"
 
 
-void drawnextblock(int blknumber,SDL_Renderer *renderer,SDL_Texture *nextblocks){
-    SDL_Rect next;
-    next.x = 589;
-    next.y = 577;
-    next.h = next.w = 192;
-
-    SDL_Rect block;
-    next.x = next.y = 0;
-    next.w = next.h = 192;
-
+int drawnextblock(int blknumber){
     if (blknumber == 0) {
-        block.x = 0;
-        SDL_RenderCopy(renderer,nextblocks,&block,&next);
+        return 0;
         }
     if (blknumber == 1) {
-        block.x = 192;
-        SDL_RenderCopy(renderer,nextblocks,&block,&next);
+        return 192;
         }
     if (blknumber == 2) {
-        block.x = 384;
-        SDL_RenderCopy(renderer,nextblocks,&block,&next);
+        return 384;
         }
     if (blknumber == 3) {
-        SDL_RenderCopy(renderer,nextblocks,&block,&next);
-        block.x = 576;
+        return 576;
         }
     if (blknumber == 4) {
-        block.x = 768;
-        SDL_RenderCopy(renderer,nextblocks,&block,&next);
+        return 768;
         }
     if (blknumber == 5) {
-        block.x = 960;
-        SDL_RenderCopy(renderer,nextblocks,&block,&next);
+        return 960;
         }
     if (blknumber == 6) {
-        block.x = 1080;
-        SDL_RenderCopy(renderer,nextblocks,&block,&next);
+        return 1152;
         }
     
 }

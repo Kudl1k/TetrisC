@@ -15,8 +15,8 @@
 #define BOARD_H 20
 #define BOARD_S 48
 
-#define WINDOW_W BOARD_S*BOARD_W
-#define WINDOW_H BOARD_S*BOARD_H
+#define GAME_W BOARD_S*BOARD_W
+#define GAME_H BOARD_S*BOARD_H
 
 #define START_X 5
 #define START_Y 0
