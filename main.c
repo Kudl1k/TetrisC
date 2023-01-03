@@ -42,7 +42,7 @@ int main()
         if (state == MAINMENU){
             rendermainmenu(renderer,mainmenutexture);
         }
-
+        printf("quit: %d\n",quit);
         if (state == LOSE)
         {
             curmap = board[0];

@@ -17,7 +17,10 @@ typedef enum{
     ABOUT
 }gamestate;
 
-Tetrino block[7] ={{
+
+
+
+static Tetrino block[7] ={{
     START_X,START_Y,4,
     0,0,0,0,
     1,1,1,1,            //! Tvar I
@@ -62,7 +65,7 @@ Tetrino block[7] ={{
     288,0,BOARD_S,BOARD_S}
     },cur,nextblock;
 
-Gameboard board[4] = {{
+static Gameboard board[4] = {{
         3,0,0,0,0,0,0,0,0,0,0,3,
         3,0,0,0,0,0,0,0,0,0,0,3,
         3,0,0,0,0,0,0,0,0,0,0,3,
