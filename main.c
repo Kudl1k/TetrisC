@@ -3,18 +3,33 @@
 
 int main()
 {
-    SDL_Renderer *renderer;
-    SDL_Window *window;
-    TTF_Font *font;
+    if (SDL_Init(SDL_INIT_VIDEO)) {
+        fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
+        exit(1);
+    }
+    SDL_Window *window = SDL_CreateWindow("TETRIS - KUD0132", 50, 50, 880, 960, SDL_WINDOW_SHOWN);
+    if (!window) {
+        fprintf(stderr, "SDL_CreateWindow Error: %s\n", SDL_GetError());
+        SDL_Quit();
+        exit(1);
+    }
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if (!renderer) {
+        SDL_DestroyWindow(window);
+        fprintf(stderr, "SDL_CreateRenderer Error: %s", SDL_GetError());
+        SDL_Quit();
+        exit(1);
+    }
+    TTF_Init();
+    TTF_Font *font = TTF_OpenFont("./src/retrogaming.ttf", 24);
+    if (!font)
+    {
+        SDL_DestroyWindow(window);
+        fprintf(stderr, "TTF_OpenFont Error: %s", SDL_GetError());
+        SDL_Quit();
+        exit(1);
+    }
 
-    SDL_Texture *blocktexture;
-    SDL_Texture *imgtexture;
-    SDL_Texture *mainmenutexture;
-    SDL_Texture *optionstexture;
-    SDL_Texture *infotexture;
-    SDL_Texture *losescreentexture;
-    SDL_Texture *winscreentexture;
-    SDL_Texture *nextblocktexture;
     SDL_Texture *scoretexture;
     SDL_Texture *linetexture;
     SDL_Texture *fallspeedtexture;
@@ -22,7 +37,7 @@ int main()
     int curnumber,nextnumber,mapnumber;
     gamestate state = MAINMENU;
     bool quit = false;
-    float secondsElapsed, fallspeed = 0;
+    float secondsElapsed = 0,fallspeed = 0.5;
     int score = 0;
     int linecounter = 0;
 
@@ -33,39 +48,243 @@ int main()
     char linetext[1000];
     char fallspeedtext[100];
 
+    SDL_Texture *blocktexture = IMG_LoadTexture(renderer,"./src/tetromino.png");
+    SDL_Texture *imgtexture = IMG_LoadTexture(renderer,"./src/MENUS/gamemenu.png");
+    SDL_Texture *mainmenutexture = IMG_LoadTexture(renderer,"./src/MENUS/mainmenu.png");
+    SDL_Texture *optionstexture = IMG_LoadTexture(renderer,"./src/MENUS/optionsmenu.png");
+    SDL_Texture *infotexture = IMG_LoadTexture(renderer,"./src/MENUS/infomenu.png");
+    SDL_Texture *losescreentexture = IMG_LoadTexture(renderer,"./src/MENUS/losemenu.png");
+    SDL_Texture *winscreentexture = IMG_LoadTexture(renderer,"./src/MENUS/winmenu.png");
+    SDL_Texture *nextblocktexture = IMG_LoadTexture(renderer,"./src/tetrominonextblock.png");
 
-    init(window, renderer,font);
-    gameinit(renderer,blocktexture,imgtexture,mainmenutexture,optionstexture,infotexture,losescreentexture,winscreentexture,nextblocktexture,curnumber,nextnumber,state);
+
+    state = MAINMENU;
+    curmap = board[0];
+    srand(time(0));
+    curnumber = rand() % 7;
+    cur = block[curnumber];
+    nextnumber = rand() % 7;
+    nextblock = block[nextnumber];
+    
     while (!quit)
     {
-        input(quit,state,secondsElapsed,scorerect,linesrect,mapnumber,fallspeed);
-        if (state == MAINMENU){
-            rendermainmenu(renderer,mainmenutexture);
+    const SDL_Rect startbox = {271,410,338,78};
+    const SDL_Rect optionsbox = {271,503,338,78};
+    const SDL_Rect infobox = {271,591,338,78};
+    const SDL_Rect exitbox = {271,680,338,78};
+    const SDL_Rect backbox = {271,680,338,78};
+    const SDL_Rect plusspeedbox = {623,318,36,36};
+    const SDL_Rect minspeedbox = {526,318,36,36};
+    const SDL_Rect mapclearbox = {228,456,80,160};
+    const SDL_Rect maptbox = {342,456,80,160};
+    const SDL_Rect mapcbox = {457,456,80,160};
+    const SDL_Rect mapuprbox = {571,456,80,160};
+
+
+    SDL_Event e;
+    SDL_Point mousepos;
+    while (SDL_PollEvent(&e))
+        {
+            if (e.type == SDL_QUIT)
+            {
+                quit = true;
+            }
+            if (e.type == SDL_MOUSEMOTION)
+            {
+                SDL_GetMouseState(&mousepos.x,&mousepos.y);
+            } 
+            if (state == GAME)
+            {
+                if (e.type == SDL_KEYDOWN)
+                {
+                switch (e.key.keysym.sym){
+                    case SDLK_UP:
+                        if(!colision(&cur,&curmap,3)){
+                            rotate_block(&cur);
+                        }
+                        break;
+                    case SDLK_DOWN:
+                        if(!issettled(&cur,&curmap)) cur.y += 1;
+                        break;
+                    case SDLK_LEFT:
+                        if(!colision(&cur, &curmap,2)) cur.x -= 1;
+                        if (issettled(&cur,&curmap))
+                        {
+                            secondsElapsed = 0;
+                        }
+                        
+                        break;
+                    case SDLK_RIGHT:
+                        if(!colision(&cur, &curmap,1)) cur.x += 1;
+                        if (issettled(&cur,&curmap))
+                        {
+                            secondsElapsed = 0;
+                        }
+                        break;
+                    case SDLK_SPACE:
+                        harddrop(&cur,&curmap);
+                        break;
+                    case SDLK_ESCAPE:
+                        state = MAINMENU;
+                        curmap = board[0];
+                        break;
+                    }
+                }
+            }
+            if (state == MAINMENU)
+            {
+                if (e.type == SDL_MOUSEBUTTONDOWN)
+                {
+                    if (e.button.button == SDL_BUTTON_LEFT)
+                    {
+                        if (SDL_PointInRect(&mousepos,&startbox)) {
+                            state = GAME;
+                            scorerect.x = 727;
+                            scorerect.y = 265;
+                            scorerect.w = 94;
+                            scorerect.h = 38;
+                            linesrect.x = 751;
+                            linesrect.y = 336;
+                            linesrect.w = 46;
+                            linesrect.h = 38;
+                            grid_reset(&curmap);
+                        }
+                        if (SDL_PointInRect(&mousepos,&optionsbox))
+                        {
+                            state = OPTIONS;
+                        }
+                        if (SDL_PointInRect(&mousepos,&infobox))
+                        {
+                            state = ABOUT;
+                        }
+                        if (SDL_PointInRect(&mousepos,&exitbox))
+                        {
+                            quit = true;
+                        }
+                    }
+                    
+                }
+            }
+            if (state == OPTIONS || state == ABOUT || state == WIN || state == LOSE)
+            {
+                if (e.type == SDL_MOUSEBUTTONDOWN)
+                {
+                    if (e.button.button == SDL_BUTTON_LEFT)
+                    {
+                        if (SDL_PointInRect(&mousepos,&backbox)){
+                            state = MAINMENU;
+                        }
+                    }
+                }     
+            }
+            if (state == OPTIONS)
+            {
+                if (e.type == SDL_MOUSEBUTTONDOWN)
+                {
+                    if (e.button.button == SDL_BUTTON_LEFT)
+                    {
+                        if (SDL_PointInRect(&mousepos,&plusspeedbox)){
+                            if (fallspeed < 1) fallspeed += 0.1;
+                        }
+                        if (SDL_PointInRect(&mousepos,&minspeedbox))
+                        {
+                            if (fallspeed > 0.2) fallspeed -= 0.1;
+                        }
+                        if (SDL_PointInRect(&mousepos,&mapclearbox)){
+                            mapnumber = 0;
+
+                            }
+                        if (SDL_PointInRect(&mousepos,&maptbox)){
+                            mapnumber = 1;
+                        }
+                        if (SDL_PointInRect(&mousepos,&mapcbox)) mapnumber = 2;
+                        if (SDL_PointInRect(&mousepos,&mapuprbox)) mapnumber = 3;
+                    }
+                }     
+            }
         }
-        printf("quit: %d\n",quit);
+        printf("%d\n",state);
+        if (state == MAINMENU){
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
+            SDL_RenderCopy(renderer,mainmenutexture,NULL,NULL);
+            SDL_RenderPresent(renderer);
+            printf("mainmenu");
+        }
         if (state == LOSE)
         {
             curmap = board[0];
             renderlosescreen(renderer,scorerect,linesrect,losescreentexture,scoretexture,linetexture);
+            printf("lose");
         }
         if (state == OPTIONS)
         {
             renderoptions(renderer,font,fallspeedtext,fallspeedtexture,optionstexture,fallspeed);
             curmap = board[mapnumber];
+            printf("options");
 
         }
         if (state == ABOUT)
         {
             renderinfo(renderer, infotexture);
+            printf("info");
         }
         if (state == WIN)
         {
+            printf("win");
             renderwinscreen(renderer,scorerect,linesrect,winscreentexture,scoretexture,linetexture);
         }
         if(state == GAME){
+            printf("game");
             Uint64 start = SDL_GetPerformanceCounter();
-            game(secondsElapsed,fallspeed,mapnumber,state,score,linecounter,nextnumber,scoretext);
-            rendergame(renderer,font,scoretexture,linetexture,imgtexture,blocktexture,nextblocktexture,scorerect,linesrect,scoretext,linetext,nextnumber,score,linecounter);
+            grid_reset(&curmap);
+            if (secondsElapsed >fallspeed && (!issettled(&cur,&curmap)))
+            {
+                
+                cur.y += 1;       //! posunovac
+                secondsElapsed = 0;
+            }
+            
+            grid_init(&cur,&curmap);
+
+            if (issettled(&cur,&curmap))
+            {
+                if (gameover(&curmap)) {
+                    state = LOSE;
+                }
+                if (gamewin(&curmap,mapnumber)) {
+                    state = WIN;
+                }
+
+                if(secondsElapsed > fallspeed){
+                    addseatledblock(&cur,&curmap,secondsElapsed);
+                    fullline(&curmap,&score,&linecounter);
+                    cur = nextblock;
+                    srand(time(0));
+                    nextnumber = rand() % 7;
+                    nextblock = block[nextnumber];
+                    sprintf(scoretext,"%d",score);
+                }
+            }
+
+            
+            SDL_Color White = {255,255,255,255};
+            SDL_Surface *scoresurface = TTF_RenderText_Solid(font,  scoretext, White);
+            scoretexture = SDL_CreateTextureFromSurface(renderer, scoresurface);
+            SDL_FreeSurface(scoresurface);
+            sprintf(scoretext,"%d",score);
+            SDL_Surface *linesurface = TTF_RenderText_Solid(font,  linetext, White);
+            linetexture = SDL_CreateTextureFromSurface(renderer, linesurface);
+            SDL_FreeSurface(linesurface);
+            sprintf(linetext,"%d",linecounter);
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
+            SDL_RenderCopy(renderer,imgtexture,NULL,NULL);
+            SDL_RenderCopy(renderer,scoretexture,NULL,&scorerect);
+            SDL_RenderCopy(renderer,linetexture,NULL,&linesrect);
+            drawgrid(&curmap,&cur,renderer,blocktexture);
+            drawnextblock(nextnumber,renderer,nextblocktexture);
+            SDL_RenderPresent(renderer);
             Uint64 end = SDL_GetPerformanceCounter();
             secondsElapsed = secondsElapsed + ( (end - start) / (float)SDL_GetPerformanceFrequency());
         }

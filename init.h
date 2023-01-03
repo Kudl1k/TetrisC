@@ -1,5 +1,11 @@
 #pragma once
 
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+
+
 #include "gameboard.h"
 #include "tetromino.h"
 #include "drawing.h"
@@ -158,7 +164,6 @@ static Gameboard board[4] = {{
 
 
 
-void init(SDL_Window *window,SDL_Renderer *renderer,TTF_Font *font);
 
 void gameinit(SDL_Renderer *renderer,SDL_Texture *blocktexture,SDL_Texture *imgtexture, SDL_Texture *mainmenutexture,SDL_Texture *optionstexture,SDL_Texture *infotexture, SDL_Texture *losescreentexture, SDL_Texture *winscreentexture,SDL_Texture *nextblocktexture,int curnumber, int nextnumber,gamestate stateofgame);
 

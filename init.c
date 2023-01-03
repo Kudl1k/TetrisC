@@ -1,46 +1,6 @@
 #include "init.h"
 
 
-void init(SDL_Window *window,SDL_Renderer *renderer,TTF_Font *font){
-    if (SDL_Init(SDL_INIT_VIDEO)) {
-        fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
-        exit(1);
-    }
-
-    if (SDL_Init(SDL_INIT_AUDIO)) {
-        fprintf(stderr, "SDL_Init Error: %s\n", SDL_GetError());
-        exit(1);
-    }
-    window = SDL_CreateWindow("TETRIS - KUD0132", 50, 50, 880, 960, SDL_WINDOW_SHOWN);
-    if (!window) {
-        fprintf(stderr, "SDL_CreateWindow Error: %s\n", SDL_GetError());
-        SDL_Quit();
-        exit(1);
-    }
-
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (!renderer) {
-        SDL_DestroyWindow(window);
-        fprintf(stderr, "SDL_CreateRenderer Error: %s", SDL_GetError());
-        SDL_Quit();
-        exit(1);
-    }
-
-        TTF_Init();
-
-    font = TTF_OpenFont("./src/retrogaming.ttf", 24);
-    if (!font)
-    {
-        SDL_DestroyWindow(window);
-        fprintf(stderr, "TTF_OpenFont Error: %s", SDL_GetError());
-        SDL_Quit();
-        exit(1);
-    }
-    
-    
-
-}
-
 void gameinit(SDL_Renderer *renderer,SDL_Texture *blocktexture,SDL_Texture *imgtexture, SDL_Texture *mainmenutexture,SDL_Texture *optionstexture,SDL_Texture *infotexture, SDL_Texture *losescreentexture, SDL_Texture *winscreentexture,SDL_Texture *nextblocktexture,int curnumber, int nextnumber,gamestate stateofgame){
     blocktexture = IMG_LoadTexture(renderer,"./src/tetromino.png");
     imgtexture = IMG_LoadTexture(renderer,"./src/MENUS/gamemenu.png");
