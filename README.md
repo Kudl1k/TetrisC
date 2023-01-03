@@ -16,4 +16,4 @@
     - incializace hry.
 
 ### Jak hru spustit?
-- pro spusteni hry staci napsat do terminalu make a program se automaticky zkompiluje a zapne
+- pro spusteni hry staci napsat do terminalu 'make' a program se automaticky zkompiluje a zapne
